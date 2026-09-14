@@ -1,0 +1,27 @@
+# coc-keeper 示例配置
+# 复制为 keeper.yaml 后按需修改。
+bots:
+  # OneBot v11 (QQ) —— 反向 WebSocket
+  - name: my-qq-bot
+    adapter: aiocqhttp
+    config:
+      host: 0.0.0.0
+      port: 2280
+      # 可选 access-token，与协议端保持一致
+      access-token: ""
+
+  # Mattermost —— WebSocket 长连接
+  # - name: my-mm-bot
+  #   adapter: mattermost
+  #   config:
+  #     server_url: https://your-mattermost.example.com
+  #     token: your-personal-or-bot-token
+  #     bot_username: your-bot-username
+
+  # Telegram —— 长轮询
+  # - name: my-tg-bot
+  #   adapter: telegram
+  #   config:
+  #     token: "123456:ABC-DEF..."
+  #     markdown_card: true
+  #     enable-stream-reply: false

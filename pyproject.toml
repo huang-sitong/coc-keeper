@@ -1,17 +1,37 @@
 [project]
 name = "coc-keeper"
 version = "0.1.0"
-description = "Add your description here"
+description = "多平台消息收发 keeper（移植自 LangBot 的消息收发模块）"
 readme = "README.md"
 authors = [
     { name = "huang-sitong", email = "huang-sitong@outlook.com" }
 ]
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "aiofiles>=24.1.0",
+    "aiohttp>=3.14.1",
+    "aiocqhttp>=1.4.4",
+    "httpx>=0.28.0",
+    "pillow>=12.2.0",
+    "pydantic>2.0",
+    "pyyaml>=6.0.2",
+    # 以下为后续移植 Telegram 等适配器预留
+    "python-telegram-bot>=22.0",
+    "telegramify-markdown>=0.5.1",
+]
 
 [project.scripts]
-coc-keeper = "coc_keeper:main"
+coc-keeper = "keeper.top.__main__:main"
 
 [build-system]
-requires = ["uv_build>=0.12.5,<0.13.0"]
-build-backend = "uv_build"
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["keeper*"]
+
+[tool.setuptools.package-data]
+keeper = ["layer1/platform/sources/*.yaml"]
+
+[tool.uv]
+package = true
