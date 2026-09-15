@@ -35,3 +35,8 @@ keeper = ["layer1/platform/sources/*.yaml"]
 
 [tool.uv]
 package = true
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
