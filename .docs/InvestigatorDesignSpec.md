@@ -1,8 +1,4 @@
-# coc-keeper设计说明书
-
-## 数据对象
-
-### 调查员相关类
+# 调查员相关类设计
 
 > 模型依据 `nouxiaxia.json`（COC7 调查员角色卡）定义。
 > `experiencedModules`、`friends` 在 JSON 中为字符串序列化数组，建模统一为强类型数组，由存储层负责序列化。
