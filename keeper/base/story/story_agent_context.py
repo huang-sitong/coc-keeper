@@ -4,13 +4,13 @@ from __future__ import annotations
 
 from typing import Any, Literal, Optional
 
-from keeper.base.coc_model.model import (
+from keeper.base.story.model import (
     AgentContextOptions,
     ClueCard,
     Visibility,
 )
-from keeper.base.coc_model.story_module import StoryModule
-from keeper.base.coc_model.story_session import StorySession
+from keeper.base.story.story_module import StoryModule
+from keeper.base.story.story_session import StorySession
 
 class StoryAgentContext:
     """把模组素材 + 运行状态组装成给 LLM 的上下文。"""

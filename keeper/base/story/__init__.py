@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """COC 故事流程图 / 模组素材包。"""
-from keeper.base.coc_model.model import (
+from keeper.base.story.model import (
     AgentContextOptions,
     AllCondition,
     AlwaysCondition,
@@ -35,10 +35,10 @@ from keeper.base.coc_model.model import (
     StoryValidation,
     Visibility,
 )
-from keeper.base.coc_model.story_graph import StoryGraph
-from keeper.base.coc_model.story_session import StorySession
-from keeper.base.coc_model.story_module import StoryModule
-from keeper.base.coc_model.story_agent_context import StoryAgentContext
+from keeper.base.story.story_graph import StoryGraph
+from keeper.base.story.story_session import StorySession
+from keeper.base.story.story_module import StoryModule
+from keeper.base.story.story_agent_context import StoryAgentContext
 
 __all__ = [
     "AgentContextOptions",

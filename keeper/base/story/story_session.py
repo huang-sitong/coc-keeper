@@ -6,7 +6,7 @@ import random
 from typing import Any, Callable, Optional
 
 from keeper.base.investigator import Investigator
-from keeper.base.coc_model.model import (
+from keeper.base.story.model import (
     CheckCondition,
     CustomAction,
     EdgeKind,
@@ -18,7 +18,7 @@ from keeper.base.coc_model.model import (
     StoryOption,
     StorySnapshot,
 )
-from keeper.base.coc_model.story_graph import StoryGraph
+from keeper.base.story.story_graph import StoryGraph
 
 class StorySession:
     """单局游戏状态：游标、历史、flag、条件求值。"""

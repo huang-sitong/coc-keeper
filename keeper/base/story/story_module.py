@@ -6,7 +6,7 @@ from typing import Any, Optional
 
 from pydantic import PrivateAttr
 
-from keeper.base.coc_model.model import (
+from keeper.base.story.model import (
     ClueCard,
     Creature,
     HandoutCard,
@@ -16,7 +16,7 @@ from keeper.base.coc_model.model import (
     StoryModuleData,
     StoryValidation,
 )
-from keeper.base.coc_model.story_graph import StoryGraph
+from keeper.base.story.story_graph import StoryGraph
 
 class StoryModule(StoryModuleData):
     """模组包：加载全部素材，提供索引与按需检索。"""

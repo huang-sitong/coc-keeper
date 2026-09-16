@@ -6,7 +6,7 @@ from typing import Any, Optional
 
 from pydantic import PrivateAttr
 
-from keeper.base.coc_model.model import (
+from keeper.base.story.model import (
     EdgeKind,
     StoryEdge,
     StoryGraphData,
