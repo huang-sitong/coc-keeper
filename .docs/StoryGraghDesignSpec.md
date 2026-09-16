@@ -299,19 +299,27 @@ interface NpcCard {
   appearsIn?: string[];      // 关联节点 id
 }
 
-interface CreatureCard {
+interface Creature {
   id: string;
   name: string;
-  appearance?: string;       // 玩家看到的形态
-  stats: Record<string, number>;
-  hp?: number;
-  mp?: number;
-  armor?: string;
-  attacks?: string[];        // 攻击描述
+  appearance?: string;         // 玩家看到的形态
+  appearsIn?: string[];        // 关联节点 id
+
+  // 详细战斗数据直接平铺，不再嵌套 profile
+  attributes: Attributes;      // 复用调查员 Attributes：STR/CON/SIZ/DEX/APP/INT/POW/EDU
+  hp: number;
+  mp: number;
+  sanity: number;
+  db: string;                  // 伤害加值，如 "0"、"+1D4"
+  build: number;
+  move: number;
+  armor: string;               // 护甲/血肉防护等
+  skills: SkillGroups;         // 复用调查员 SkillGroups，直接给百分比
+  weapons: WeaponList;         // 复用调查员 WeaponList：武器伤害、攻击次数等
   spells?: string[];
-  tactics?: string;          // 守密人战术
-  sanityLoss?: string;       // 理智损失，如 "1/1D4"
-  appearsIn?: string[];
+  attacks?: string[];          // 额外的攻击/战斗方式描述
+  sanityLoss?: string;         // 理智损失，如 "1/1D4"
+  tactics?: string;            // 守密人战术
 }
 
 interface ItemCard {
@@ -359,7 +367,7 @@ interface StoryModuleData {
   meta: StoryMeta;
   graph: StoryGraphData;
   npcs: NpcCard[];
-  creatures: CreatureCard[];
+  creatures: Creature[];
   items: ItemCard[];
   clues: ClueCard[];
   handouts: HandoutCard[];
@@ -371,7 +379,7 @@ class StoryModule {
   meta: StoryMeta;
   graph: StoryGraph;
   npcs: NpcCard[];
-  creatures: CreatureCard[];
+  creatures: Creature[];
   items: ItemCard[];
   clues: ClueCard[];
   handouts: HandoutCard[];
@@ -379,7 +387,7 @@ class StoryModule {
 
   // 惰性索引：id -> Card；appearsIn -> Card[] 等
   getNpc(id: string): NpcCard | undefined;
-  getCreature(id: string): CreatureCard | undefined;
+  getCreature(id: string): Creature | undefined;
   getItem(id: string): ItemCard | undefined;
   getClue(id: string): ClueCard | undefined;
   getHandout(id: string): HandoutCard | undefined;
@@ -387,7 +395,7 @@ class StoryModule {
   /** 取某个场景相关的全部素材（NPC/敌人/物品/线索/秘密） */
   getEntitiesForNode(nodeId: string): {
     npcs: NpcCard[];
-    creatures: CreatureCard[];
+    creatures: Creature[];
     items: ItemCard[];
     clues: ClueCard[];
     secrets: Secret[];

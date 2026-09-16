@@ -15,7 +15,14 @@ from typing import Annotated, Any, Callable, Literal, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 
-from keeper.base.investigator import AttributeName, Difficulty, Investigator
+from keeper.base.investigator import (
+    AttributeName,
+    Attributes,
+    Difficulty,
+    Investigator,
+    SkillGroups,
+    WeaponList,
+)
 
 __all__ = [
     "StoryNodeType",
@@ -45,7 +52,7 @@ __all__ = [
     "StorySession",
     "StoryMeta",
     "NpcCard",
-    "CreatureCard",
+    "Creature",
     "ItemCard",
     "ClueCard",
     "HandoutCard",
@@ -655,21 +662,33 @@ class NpcCard(StoryBaseModel):
     appears_in: list[str] = Field(default_factory=list, alias="appearsIn")
 
 
-class CreatureCard(StoryBaseModel):
-    """敌人/怪物卡片。"""
+class Creature(StoryBaseModel):
+    """敌人/怪物：叙述字段与详细战斗数据合并为单个数据类。
+
+    属性复用 ``Attributes``，技能复用 ``SkillGroups``，武器复用 ``WeaponList``；
+    HP/MP/SAN/DB/Build/Move/Armor 直接以模组给出的数值记录。
+    """
 
     id: str
     name: str
     appearance: Optional[str] = None
-    stats: dict[str, Any] = Field(default_factory=dict)
-    hp: Optional[int] = None
-    mp: Optional[int] = None
-    armor: Optional[str] = None
-    attacks: list[str] = Field(default_factory=list)
-    spells: list[str] = Field(default_factory=list)
-    tactics: Optional[str] = None
-    sanity_loss: Optional[str] = Field(default=None, alias="sanityLoss")
     appears_in: list[str] = Field(default_factory=list, alias="appearsIn")
+
+    # 详细战斗数据（类似简化版调查员）
+    attributes: Attributes = Field(default_factory=Attributes)
+    hp: int = 0
+    mp: int = 0
+    sanity: int = 0
+    db: str = "0"
+    build: int = 0
+    move: int = 8
+    armor: str = "0"
+    skills: SkillGroups = Field(default_factory=SkillGroups)
+    weapons: WeaponList = Field(default_factory=WeaponList)
+    spells: list[str] = Field(default_factory=list)
+    attacks: list[str] = Field(default_factory=list)
+    sanity_loss: Optional[str] = Field(default=None, alias="sanityLoss")
+    tactics: Optional[str] = None
 
 
 class ItemCard(StoryBaseModel):
@@ -727,7 +746,7 @@ class StoryModuleData(StoryBaseModel):
     meta: StoryMeta
     graph: StoryGraph
     npcs: list[NpcCard] = Field(default_factory=list)
-    creatures: list[CreatureCard] = Field(default_factory=list)
+    creatures: list[Creature] = Field(default_factory=list)
     items: list[ItemCard] = Field(default_factory=list)
     clues: list[ClueCard] = Field(default_factory=list)
     handouts: list[HandoutCard] = Field(default_factory=list)
@@ -738,7 +757,7 @@ class StoryModule(StoryModuleData):
     """模组包：加载全部素材，提供索引与按需检索。"""
 
     _npc_index: Optional[dict[str, NpcCard]] = PrivateAttr(default=None)
-    _creature_index: Optional[dict[str, CreatureCard]] = PrivateAttr(default=None)
+    _creature_index: Optional[dict[str, Creature]] = PrivateAttr(default=None)
     _item_index: Optional[dict[str, ItemCard]] = PrivateAttr(default=None)
     _clue_index: Optional[dict[str, ClueCard]] = PrivateAttr(default=None)
     _handout_index: Optional[dict[str, HandoutCard]] = PrivateAttr(default=None)
@@ -762,7 +781,7 @@ class StoryModule(StoryModuleData):
         self._ensure_indexes()
         return self._npc_index.get(npc_id)  # type: ignore[union-attr]
 
-    def get_creature(self, creature_id: str) -> Optional[CreatureCard]:
+    def get_creature(self, creature_id: str) -> Optional[Creature]:
         self._ensure_indexes()
         return self._creature_index.get(creature_id)  # type: ignore[union-attr]
 
@@ -1017,16 +1036,30 @@ class StoryAgentContext:
                 + (f"守密人笔记：{card.keeper_notes or ''}" if self.options.include_keeper_info else "")
             )
         if kind == "creature":
-            return (
-                f"【敌人】{card.name}\n"
-                f"外貌：{card.appearance or ''}\n"
-                f"属性：{card.stats}\n"
-                f"HP：{card.hp} MP：{card.mp}\n"
-                f"护甲：{card.armor or ''}\n"
-                f"攻击：{'；'.join(card.attacks)}\n"
-                f"法术：{'；'.join(card.spells) or '无'}\n"
-                + (f"战术：{card.tactics or ''}" if self.options.include_keeper_info else "")
-            )
+            attrs = card.attributes.model_dump(by_alias=True)
+            skill_lines = []
+            for group in card.skills.all_group_lists():
+                for skill in group:
+                    skill_lines.append(f"{skill.name} {skill.total}%")
+            weapon_lines = [f"{w.name} {w.damage}" for w in card.weapons.items]
+            lines = [
+                f"【敌人】{card.name}",
+                f"外貌：{card.appearance or ''}",
+                f"属性：{attrs}",
+                f"HP：{card.hp} MP：{card.mp} SAN：{card.sanity}",
+                f"DB：{card.db} Build：{card.build} Move：{card.move}",
+                f"护甲：{card.armor or ''}",
+                f"技能：{'；'.join(skill_lines) or '无'}",
+                f"武器：{'；'.join(weapon_lines) or '无'}",
+                f"攻击：{'；'.join(card.attacks) or '无'}",
+                f"法术：{'；'.join(card.spells) or '无'}",
+            ]
+            if self.options.include_keeper_info:
+                if card.tactics:
+                    lines.append(f"战术：{card.tactics}")
+                if card.sanity_loss:
+                    lines.append(f"理智损失：{card.sanity_loss}")
+            return "\n".join(lines)
         if kind == "item":
             return (
                 f"【物品】{card.name}\n"

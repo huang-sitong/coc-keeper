@@ -170,3 +170,23 @@ def test_story_agent_context_build_prompt():
 if __name__ == "__main__":
     import pytest
     raise SystemExit(pytest.main([__file__]))
+
+
+def test_creature_profile_detailed():
+    module = load_module()
+    corbitt = module.get_creature("creature_corbitt")
+    assert corbitt is not None
+    assert corbitt.attributes.str == 90
+    assert corbitt.hp == 16
+    assert corbitt.mp == 18
+    assert corbitt.db == "+1D4"
+    assert corbitt.build == 1
+    assert corbitt.move == 8
+    skill_names = {
+        s.name
+        for group in corbitt.skills.all_group_lists()
+        for s in group
+    }
+    assert "斗殴" in skill_names
+    assert "克苏鲁神话" in skill_names
+    assert any(w.name == "浮空魔法匕首" for w in corbitt.weapons.items)

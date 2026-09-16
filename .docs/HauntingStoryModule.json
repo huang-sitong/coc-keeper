@@ -1196,80 +1196,195 @@
       "id": "creature_corbitt",
       "name": "沃尔特·科比特（不死躯体）",
       "appearance": "干枯、像树皮一样、约六英尺高、赤裸、眼睛燃烧般睁大、鼻子像刀刃，散发腐烂玉米般的甜腐气味。",
-      "stats": {
-        "STR": 90,
-        "CON": 115,
-        "SIZ": 55,
-        "INT": 80,
-        "POW": 90,
-        "DEX": 35,
-        "APP": 5,
-        "EDU": 80
+      "appearsIn": [
+        "corbitt_lair",
+        "corbitt_victory",
+        "corbitt_defeat"
+      ],
+      "attributes": {
+        "str": 90,
+        "con": 115,
+        "siz": 55,
+        "dex": 35,
+        "app": 5,
+        "int": 80,
+        "pow": 90,
+        "edu": 80
       },
       "hp": 16,
       "mp": 18,
+      "sanity": 0,
+      "db": "+1D4",
+      "build": 1,
+      "move": 8,
       "armor": "血肉防护 2D6（消耗后减少）",
-      "attacks": [
-        "肉搏攻击 50% (25/10)，伤害 1D3+1D4，可能造成感染/精神错乱",
-        "浮空魔法匕首，消耗1 MP/回合"
-      ],
+      "skills": {
+        "combat": [
+          {
+            "id": "fight",
+            "name": "斗殴",
+            "base": 50
+          }
+        ],
+        "move": [
+          {
+            "id": "dodge",
+            "name": "闪避",
+            "base": 17
+          }
+        ],
+        "other": [
+          {
+            "id": "cthulhu_mythos",
+            "name": "克苏鲁神话",
+            "base": 17
+          },
+          {
+            "id": "intimidate",
+            "name": "恐吓",
+            "base": 64
+          },
+          {
+            "id": "listen",
+            "name": "聆听",
+            "base": 60
+          },
+          {
+            "id": "sleight_of_hand",
+            "name": "妙手",
+            "base": 30
+          },
+          {
+            "id": "stealth",
+            "name": "潜行",
+            "base": 72
+          }
+        ]
+      },
+      "weapons": {
+        "items": [
+          {
+            "id": "corbitt_fist",
+            "name": "肉搏",
+            "damage": "1D3+1D4",
+            "tho": "1"
+          },
+          {
+            "id": "corbitt_dagger",
+            "name": "浮空魔法匕首",
+            "damage": "1D4+2",
+            "tho": "1"
+          }
+        ]
+      },
       "spells": [
         "支配术（特别版）",
         "血肉防护",
         "召唤/驱逐异次元蹒跚者"
       ],
-      "tactics": "尽量不移动；被威胁时才驱动尸体；每回合可施放支配术或操控匕首；被自己匕首刺中立即化为尘埃。",
-      "sanityLoss": "见到他移动时 1D8",
-      "appearsIn": [
-        "corbitt_lair",
-        "corbitt_victory",
-        "corbitt_defeat"
-      ]
+      "attacks": [
+        "肉搏攻击 50% (25/10)，伤害 1D3+1D4，可能造成感染/精神错乱",
+        "浮空魔法匕首：每回合1次，消耗1 MP，普通成功 1D4+2，极难成功 6+1D4+2"
+      ],
+      "sanityLoss": "1D8（见到他移动时）",
+      "tactics": "尽量不移动；被威胁时才驱动尸体；可施放支配术或操控匕首；被自己匕首刺中立即化为尘埃。"
     },
     {
       "id": "creature_rat_swarm",
       "name": "鼠群",
       "appearance": "墙壁夹层里蜂拥而出的老鼠群，约十只。",
-      "stats": {
-        "STR": 35,
-        "CON": 55,
-        "SIZ": 35,
-        "POW": 50,
-        "DEX": 70
+      "appearsIn": [
+        "basement_rats"
+      ],
+      "attributes": {
+        "str": 35,
+        "con": 55,
+        "siz": 35,
+        "dex": 70,
+        "int": 5,
+        "pow": 50
       },
       "hp": 9,
-      "mp": null,
+      "mp": 10,
+      "sanity": 0,
+      "db": "-1",
+      "build": -1,
+      "move": 9,
       "armor": "无",
+      "skills": {
+        "combat": [
+          {
+            "id": "fight",
+            "name": "斗殴",
+            "base": 40
+          }
+        ],
+        "move": [
+          {
+            "id": "dodge",
+            "name": "闪避",
+            "base": 42
+          }
+        ]
+      },
+      "weapons": {
+        "items": [
+          {
+            "id": "rat_bite",
+            "name": "鼠群啃咬",
+            "damage": "1D3",
+            "tho": "1"
+          },
+          {
+            "id": "rat_swarm_maneuver",
+            "name": "蜂拥而上（战技）",
+            "damage": "2D6",
+            "tho": "1"
+          }
+        ]
+      },
+      "spells": [],
       "attacks": [
         "肉搏攻击 40% (20/8)，伤害 1D3",
         "蜂拥而上（战技），伤害 2D6"
       ],
-      "spells": [],
-      "tactics": "只要杀死一两只就会溃逃；出现只为增加趣味。",
       "sanityLoss": null,
-      "appearsIn": [
-        "basement_rats"
-      ]
+      "tactics": "只要杀死一两只老鼠，剩余就会溃逃；鼠群出现主要为增加游戏趣味。"
     },
     {
       "id": "creature_floating_dagger",
       "name": "浮空匕首",
       "appearance": "带有华丽刀柄的老刀，刀刃上有一层厚厚的奇怪锈蚀（干涸的血）。",
-      "stats": {},
-      "hp": null,
-      "mp": null,
-      "armor": "无",
-      "attacks": [
-        "每回合一次，对抗科比特 POW；普通成功 1D4+2，极难成功 6+1D4+2",
-        "未发现时获得奖励骰且无法闪避"
-      ],
-      "spells": [],
-      "tactics": "科比特每回合消耗1 MP操控；可被战技抓住；被抓住后可反过来杀死科比特。",
-      "sanityLoss": "目击攻击 1/1D4",
       "appearsIn": [
         "basement_dagger",
         "corbitt_lair"
-      ]
+      ],
+      "attributes": {},
+      "hp": 1,
+      "mp": 0,
+      "sanity": 0,
+      "db": "0",
+      "build": 0,
+      "move": 0,
+      "armor": "无",
+      "skills": {},
+      "weapons": {
+        "items": [
+          {
+            "id": "dagger_attack",
+            "name": "浮空魔法匕首",
+            "damage": "1D4+2 / 极难 6+1D4+2",
+            "tho": "1"
+          }
+        ]
+      },
+      "spells": [],
+      "attacks": [
+        "每回合一次，对抗科比特 POW；普通成功 1D4+2，极难成功 6+1D4+2",
+        "未被发现时获得奖励骰且无法闪避"
+      ],
+      "sanityLoss": "1/1D4",
+      "tactics": "科比特每回合消耗1 MP操控；可被战技抓住；被抓住后可反过来杀死科比特。"
     }
   ],
   "items": [
