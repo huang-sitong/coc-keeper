@@ -458,4 +458,4 @@ class StoryAgentContext {
 
 > 实例：除流程 JSON 外，另将《鬼屋》的元数据/NPC/敌人/物品/线索/秘密整理为 [`HauntingStoryModule.json`](./HauntingStoryModule.json)，作为 `StoryModuleData` 的参考。
 
-> Python 实现：接口已按本设计实现于 `keeper/base/story.py`，可通过 `StoryModule.from_json()` 加载 [`HauntingStoryModule.json`](./HauntingStoryModule.json) 进行运行。
+> Python 实现：接口已按本设计实现于 `keeper/base/coc_model/`，可通过 `StoryModule.from_json()` 加载 [`HauntingStoryModule.json`](./HauntingStoryModule.json) 进行运行。

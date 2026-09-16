@@ -3,7 +3,7 @@
 import json
 from pathlib import Path
 
-from keeper.base.story import (
+from keeper.base.coc_model import (
     EdgeKind,
     FlagCondition,
     StoryAgentContext,
