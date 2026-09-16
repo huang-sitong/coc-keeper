@@ -9,7 +9,6 @@ from keeper.base.story.model import (
     ClearFlagAction,
     ClueCard,
     Condition,
-    Creature,
     CustomAction,
     EdgeKind,
     FlagCondition,
@@ -17,13 +16,13 @@ from keeper.base.story.model import (
     HandoutCard,
     IncFlagAction,
     ItemCard,
+    ModuleBaseModel,
     NpcCard,
     NotCondition,
     RandomCondition,
     Secret,
     SetFlagAction,
     StoryAction,
-    StoryBaseModel,
     StoryEdge,
     StoryGraphData,
     StoryMeta,
@@ -35,6 +34,7 @@ from keeper.base.story.model import (
     StoryValidation,
     Visibility,
 )
+
 from keeper.base.story.story_graph import StoryGraph
 from keeper.base.story.story_session import StorySession
 from keeper.base.story.story_module import StoryModule
@@ -49,7 +49,6 @@ __all__ = [
     "ClearFlagAction",
     "ClueCard",
     "Condition",
-    "Creature",
     "CustomAction",
     "EdgeKind",
     "FlagCondition",
@@ -57,6 +56,7 @@ __all__ = [
     "HandoutCard",
     "IncFlagAction",
     "ItemCard",
+    "ModuleBaseModel",
     "NpcCard",
     "NotCondition",
     "RandomCondition",
@@ -64,7 +64,6 @@ __all__ = [
     "SetFlagAction",
     "StoryAction",
     "StoryAgentContext",
-    "StoryBaseModel",
     "StoryEdge",
     "StoryGraph",
     "StoryGraphData",

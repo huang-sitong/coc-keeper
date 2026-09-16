@@ -190,3 +190,70 @@ def test_creature_profile_detailed():
     assert "斗殴" in skill_names
     assert "克苏鲁神话" in skill_names
     assert any(w.name == "浮空魔法匕首" for w in corbitt.weapons.items)
+
+
+def test_creature_package_and_method_interfaces():
+    from keeper.base.investigator import Skill, SkillGroup, Weapon
+    from keeper.base.creature import Creature
+    from keeper.base.creature.creature import Creature as CreatureFromCore
+    from keeper.base.module_base import ModuleBaseModel
+
+    assert Creature is CreatureFromCore
+    assert issubclass(Creature, ModuleBaseModel)
+
+    module = load_module()
+    corbitt = module.get_creature("creature_corbitt")
+    assert corbitt is not None
+    assert corbitt.get_attribute("str") == 90
+    assert corbitt.get_skill_by_name("斗殴").total == 50
+    assert corbitt.check_skill("fight", rng=lambda: 0.01).success is True
+    assert corbitt.check_attribute("str", rng=lambda: 0.01).success is True
+
+    attack = corbitt.attack_by_skill("fight", rng=lambda: 0.01)
+    assert attack is not None and attack.hit is True
+    assert attack.weapon_id == "corbitt_fist"
+    assert attack.damage_roll == 2  # 1D3+1D4 with rng=0.01 -> 1+1
+
+    assert corbitt.get_armor_expression() == "2D6"
+    assert corbitt.roll_armor(rng=lambda: 0.25) == 4
+    assert corbitt.resolve_armor(rng=lambda: 0.25).value == 4
+
+    dagger = module.get_creature("creature_floating_dagger")
+    assert dagger.get_sanity_loss_expression(success=True) == "1"
+    assert dagger.get_sanity_loss_expression(success=False) == "1D4"
+    assert dagger.roll_sanity_loss(success=True, rng=lambda: 0.5) == 1
+    assert dagger.resolve_sanity_loss(success=False, rng=lambda: 0.5).loss == 3
+
+
+def test_creature_attack_and_damage_methods():
+    from keeper.base.investigator import Skill, SkillGroup, Weapon
+    from keeper.base.creature import Creature
+
+    monster = Creature(
+        id="monster",
+        name="测试怪物",
+        hp=10,
+        attributes={"str": 50, "con": 50},
+    )
+    assert monster.get_hp_max() == 10
+
+    monster.skills.add_skill(SkillGroup.COMBAT, Skill(id="claw", name="爪击", base=60))
+    monster.weapons.add_weapon(Weapon(id="claw", name="爪", skill_id="claw", damage="1D6", num=""))
+
+    attack = monster.attack_by_skill("claw", rng=lambda: 0.01)
+    assert attack is not None and attack.hit is True
+    assert attack.attack is not None
+    assert attack.attack.damage == "1D6"
+    assert attack.damage_roll == 1
+
+    damage = monster.take_damage(6, rng=lambda: 0.01)
+    assert monster.hp == 4
+    assert damage.major_wound is True
+    assert damage.con_check is not None and damage.con_check.success is True
+    assert damage.dead is False
+    assert monster.is_alive() is True
+
+    damage = monster.take_damage(20, rng=lambda: 0.01)
+    assert monster.hp == -10
+    assert monster.is_dead() is True
+    assert damage.dead is True

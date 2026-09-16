@@ -13,15 +13,14 @@ import keeper.base.event_logger as abstract_platform_logger
 class AbstractMessagePlatformAdapter(pydantic.BaseModel, metaclass=abc.ABCMeta):
     """消息平台适配器基类"""
 
+    model_config = pydantic.ConfigDict(arbitrary_types_allowed=True)
+
     bot_account_id: str = pydantic.Field(default="")
     """机器人账号ID，需要在初始化时设置"""
 
     config: dict
 
     logger: abstract_platform_logger.AbstractEventLogger = pydantic.Field(exclude=True)
-
-    class Config:
-        arbitrary_types_allowed = True
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

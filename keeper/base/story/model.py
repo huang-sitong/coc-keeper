@@ -1,30 +1,19 @@
 # -*- coding: utf-8 -*-
 """COC 故事流程图 / 模组素材：纯数据模型。
 
-无自定义方法的类集中在此，供各功能模块复用。
+无自定义方法的基础数据类集中在此；敌人/怪物模型见
+``keeper.base.creature``。
 """
 from __future__ import annotations
 
 from enum import Enum
 from typing import Annotated, Any, Literal, Optional, Union
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
 
-from keeper.base.investigator import (
-    AttributeName,
-    Attributes,
-    Difficulty,
-    SkillGroups,
-    WeaponList,
-)
-
-
-
-
-class StoryBaseModel(BaseModel):
-    """统一允许 snake_case 字段名 + camelCase JSON alias。"""
-
-    model_config = ConfigDict(populate_by_name=True, serialize_by_alias=True)
+from keeper.base.creature import Creature as _Creature
+from keeper.base.investigator import AttributeName, Difficulty
+from keeper.base.module_base import ModuleBaseModel
 
 
 # ==================== 基础类型 ====================
@@ -59,24 +48,24 @@ FlagValue = Union[bool, int, str]
 # ==================== 动作 ====================
 
 
-class SetFlagAction(StoryBaseModel):
+class SetFlagAction(ModuleBaseModel):
     kind: Literal["setFlag"]
     flag: str
     value: FlagValue
 
 
-class IncFlagAction(StoryBaseModel):
+class IncFlagAction(ModuleBaseModel):
     kind: Literal["incFlag"]
     flag: str
     delta: int
 
 
-class ClearFlagAction(StoryBaseModel):
+class ClearFlagAction(ModuleBaseModel):
     kind: Literal["clearFlag"]
     flag: str
 
 
-class CustomAction(StoryBaseModel):
+class CustomAction(ModuleBaseModel):
     kind: Literal["custom"]
     type: str
     payload: Any = None
@@ -91,18 +80,18 @@ StoryAction = Annotated[
 # ==================== 条件 ====================
 
 
-class AlwaysCondition(StoryBaseModel):
+class AlwaysCondition(ModuleBaseModel):
     kind: Literal["always"]
 
 
-class FlagCondition(StoryBaseModel):
+class FlagCondition(ModuleBaseModel):
     kind: Literal["flag"]
     flag: str
     op: Literal["exists", "not-exists", "==", "!=", ">", "<", ">=", "<="]
     value: Optional[FlagValue] = None
 
 
-class CheckCondition(StoryBaseModel):
+class CheckCondition(ModuleBaseModel):
     kind: Literal["check"]
     skill_id: Optional[str] = Field(default=None, alias="skillId")
     attribute: Optional[AttributeName] = None
@@ -110,22 +99,22 @@ class CheckCondition(StoryBaseModel):
     require_success: bool = Field(default=True, alias="requireSuccess")
 
 
-class RandomCondition(StoryBaseModel):
+class RandomCondition(ModuleBaseModel):
     kind: Literal["random"]
     chance: float
 
 
-class NotCondition(StoryBaseModel):
+class NotCondition(ModuleBaseModel):
     kind: Literal["not"]
     condition: Condition
 
 
-class AllCondition(StoryBaseModel):
+class AllCondition(ModuleBaseModel):
     kind: Literal["all"]
     conditions: list[Condition]
 
 
-class AnyCondition(StoryBaseModel):
+class AnyCondition(ModuleBaseModel):
     kind: Literal["any"]
     conditions: list[Condition]
 
@@ -147,7 +136,7 @@ Condition = Annotated[
 # ==================== 节点与边 ====================
 
 
-class StoryNode(StoryBaseModel):
+class StoryNode(ModuleBaseModel):
     """故事节点：场景/剧情段。"""
 
     id: str
@@ -159,7 +148,7 @@ class StoryNode(StoryBaseModel):
     metadata: dict[str, Any] = Field(default_factory=dict)
 
 
-class StoryEdge(StoryBaseModel):
+class StoryEdge(ModuleBaseModel):
     """故事边：节点间转移。"""
 
     id: str
@@ -172,7 +161,7 @@ class StoryEdge(StoryBaseModel):
     metadata: dict[str, Any] = Field(default_factory=dict)
 
 
-class StoryGraphData(StoryBaseModel):
+class StoryGraphData(ModuleBaseModel):
     """故事图 JSON 数据形态。"""
 
     id: str
@@ -183,7 +172,7 @@ class StoryGraphData(StoryBaseModel):
     edges: list[StoryEdge] = Field(default_factory=list)
 
 
-class StoryValidation(StoryBaseModel):
+class StoryValidation(ModuleBaseModel):
     """校验结果。"""
 
     ok: bool
@@ -195,7 +184,7 @@ class StoryValidation(StoryBaseModel):
 # ==================== 运行时会话 ====================
 
 
-class StorySnapshot(StoryBaseModel):
+class StorySnapshot(ModuleBaseModel):
     """会话存档。"""
 
     current_node_id: str = Field(alias="currentNodeId")
@@ -204,7 +193,7 @@ class StorySnapshot(StoryBaseModel):
     flags: dict[str, FlagValue] = Field(default_factory=dict)
 
 
-class StoryOption(StoryBaseModel):
+class StoryOption(ModuleBaseModel):
     """玩家可见选项。"""
 
     edge_id: str = Field(alias="edgeId")
@@ -216,7 +205,7 @@ class StoryOption(StoryBaseModel):
 # ==================== 模组素材 ====================
 
 
-class StoryMeta(StoryBaseModel):
+class StoryMeta(ModuleBaseModel):
     """模组元信息。"""
 
     id: str
@@ -231,7 +220,7 @@ class StoryMeta(StoryBaseModel):
     ending_conditions: list[str] = Field(default_factory=list, alias="endingConditions")
 
 
-class NpcCard(StoryBaseModel):
+class NpcCard(ModuleBaseModel):
     """NPC 卡片。"""
 
     id: str
@@ -246,36 +235,7 @@ class NpcCard(StoryBaseModel):
     appears_in: list[str] = Field(default_factory=list, alias="appearsIn")
 
 
-class Creature(StoryBaseModel):
-    """敌人/怪物：叙述字段与详细战斗数据合并为单个数据类。
-
-    属性复用 ``Attributes``，技能复用 ``SkillGroups``，武器复用 ``WeaponList``；
-    HP/MP/SAN/DB/Build/Move/Armor 直接以模组给出的数值记录。
-    """
-
-    id: str
-    name: str
-    appearance: Optional[str] = None
-    appears_in: list[str] = Field(default_factory=list, alias="appearsIn")
-
-    # 详细战斗数据（类似简化版调查员）
-    attributes: Attributes = Field(default_factory=Attributes)
-    hp: int = 0
-    mp: int = 0
-    sanity: int = 0
-    db: str = "0"
-    build: int = 0
-    move: int = 8
-    armor: str = "0"
-    skills: SkillGroups = Field(default_factory=SkillGroups)
-    weapons: WeaponList = Field(default_factory=WeaponList)
-    spells: list[str] = Field(default_factory=list)
-    attacks: list[str] = Field(default_factory=list)
-    sanity_loss: Optional[str] = Field(default=None, alias="sanityLoss")
-    tactics: Optional[str] = None
-
-
-class ItemCard(StoryBaseModel):
+class ItemCard(ModuleBaseModel):
     """物品卡片。"""
 
     id: str
@@ -288,7 +248,7 @@ class ItemCard(StoryBaseModel):
     appears_in: list[str] = Field(default_factory=list, alias="appearsIn")
 
 
-class ClueCard(StoryBaseModel):
+class ClueCard(ModuleBaseModel):
     """线索卡片。"""
 
     id: str
@@ -302,7 +262,7 @@ class ClueCard(StoryBaseModel):
     related_clue_ids: list[str] = Field(default_factory=list, alias="relatedClueIds")
 
 
-class HandoutCard(StoryBaseModel):
+class HandoutCard(ModuleBaseModel):
     """给玩家的文字材料。"""
 
     id: str
@@ -313,7 +273,7 @@ class HandoutCard(StoryBaseModel):
     reveal_condition: Optional[Condition] = Field(default=None, alias="revealCondition")
 
 
-class Secret(StoryBaseModel):
+class Secret(ModuleBaseModel):
     """仅守密人知道的秘密。"""
 
     id: str
@@ -324,13 +284,13 @@ class Secret(StoryBaseModel):
     related_clue_ids: list[str] = Field(default_factory=list, alias="relatedClueIds")
 
 
-class StoryModuleData(StoryBaseModel):
+class StoryModuleData(ModuleBaseModel):
     """模组总包：流程 + 素材。"""
 
     meta: StoryMeta
     graph: StoryGraphData
     npcs: list[NpcCard] = Field(default_factory=list)
-    creatures: list[Creature] = Field(default_factory=list)
+    creatures: list[_Creature] = Field(default_factory=list)
     items: list[ItemCard] = Field(default_factory=list)
     clues: list[ClueCard] = Field(default_factory=list)
     handouts: list[HandoutCard] = Field(default_factory=list)
@@ -341,7 +301,7 @@ class StoryModuleData(StoryBaseModel):
 # ==================== Agent 上下文组装 ====================
 
 
-class AgentContextOptions(StoryBaseModel):
+class AgentContextOptions(ModuleBaseModel):
     """Agent 上下文组装选项。"""
 
     include_keeper_info: bool = Field(default=True, alias="includeKeeperInfo")

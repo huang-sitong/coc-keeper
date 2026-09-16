@@ -6,9 +6,9 @@ from typing import Any, Optional
 
 from pydantic import PrivateAttr
 
+from keeper.base.creature import Creature
 from keeper.base.story.model import (
     ClueCard,
-    Creature,
     HandoutCard,
     ItemCard,
     NpcCard,

@@ -163,30 +163,7 @@ class StoryAgentContext:
                 + (f"守密人笔记：{card.keeper_notes or ''}" if self.options.include_keeper_info else "")
             )
         if kind == "creature":
-            attrs = card.attributes.model_dump(by_alias=True)
-            skill_lines = []
-            for group in card.skills.all_group_lists():
-                for skill in group:
-                    skill_lines.append(f"{skill.name} {skill.total}%")
-            weapon_lines = [f"{w.name} {w.damage}" for w in card.weapons.items]
-            lines = [
-                f"【敌人】{card.name}",
-                f"外貌：{card.appearance or ''}",
-                f"属性：{attrs}",
-                f"HP：{card.hp} MP：{card.mp} SAN：{card.sanity}",
-                f"DB：{card.db} Build：{card.build} Move：{card.move}",
-                f"护甲：{card.armor or ''}",
-                f"技能：{'；'.join(skill_lines) or '无'}",
-                f"武器：{'；'.join(weapon_lines) or '无'}",
-                f"攻击：{'；'.join(card.attacks) or '无'}",
-                f"法术：{'；'.join(card.spells) or '无'}",
-            ]
-            if self.options.include_keeper_info:
-                if card.tactics:
-                    lines.append(f"战术：{card.tactics}")
-                if card.sanity_loss:
-                    lines.append(f"理智损失：{card.sanity_loss}")
-            return "\n".join(lines)
+            return card.to_markdown(self.options.include_keeper_info)
         if kind == "item":
             return (
                 f"【物品】{card.name}\n"
