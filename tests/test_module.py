@@ -1,30 +1,30 @@
 # -*- coding: utf-8 -*-
-"""故事流程图 / 模组素材模型测试。"""
+"""剧情图 / 模组素材模型测试。"""
 import json
 from pathlib import Path
 
-from keeper.base.story import (
+from keeper.base.module import (
     EdgeKind,
     FlagCondition,
-    StoryAgentContext,
-    StoryGraph,
-    StoryModule,
-    StoryNode,
-    StoryNodeType,
-    StorySession,
-    StoryEdge,
+    CocAgentContext,
+    PlotGraph,
+    CocModule,
+    PlotNode,
+    PlotNodeType,
+    PlotSession,
+    PlotEdge,
     SetFlagAction,
 )
 
 
-def load_graph() -> StoryGraph:
+def load_graph() -> PlotGraph:
     path = Path(__file__).resolve().parents[1] / ".docs" / "HauntingStoryGraph.json"
-    return StoryGraph.from_json(json.loads(path.read_text(encoding="utf-8")))
+    return PlotGraph.from_json(json.loads(path.read_text(encoding="utf-8")))
 
 
-def load_module() -> StoryModule:
+def load_module() -> CocModule:
     path = Path(__file__).resolve().parents[1] / ".docs" / "HauntingStoryModule.json"
-    return StoryModule.from_json(json.loads(path.read_text(encoding="utf-8")))
+    return CocModule.from_json(json.loads(path.read_text(encoding="utf-8")))
 
 
 def test_load_haunting_graph():
@@ -45,19 +45,19 @@ def test_load_haunting_module():
     assert len(module.get_entities_for_node("newspaper_success")["npcs"]) >= 1
 
 
-def test_story_graph_crud():
-    graph = StoryGraph(
+def test_plot_graph_crud():
+    graph = PlotGraph(
         id="g",
         title="test",
         start_node_id="start",
-        nodes=[StoryNode(id="start", type=StoryNodeType.START, title="开始", text="开始")],
+        nodes=[PlotNode(id="start", type=PlotNodeType.START, title="开始", text="开始")],
         edges=[],
     )
-    end = StoryNode(id="end", type=StoryNodeType.END, title="结束", text="结束")
+    end = PlotNode(id="end", type=PlotNodeType.END, title="结束", text="结束")
     assert graph.add_node(end) is True
     assert graph.add_node(end) is False
 
-    edge = StoryEdge(
+    edge = PlotEdge(
         id="e1",
         from_node="start",
         to="end",
@@ -70,22 +70,22 @@ def test_story_graph_crud():
     assert graph.validate().ok is True
 
 
-def test_story_session_auto_and_choice():
-    graph = StoryGraph(
+def test_plot_session_auto_and_choice():
+    graph = PlotGraph(
         id="g",
         title="test",
         start_node_id="start",
         nodes=[
-            StoryNode(id="start", type=StoryNodeType.START, title="开始", text="开始"),
-            StoryNode(id="hub", type=StoryNodeType.SCENE, title="选择", text="选择"),
-            StoryNode(id="end", type=StoryNodeType.END, title="结束", text="结束"),
+            PlotNode(id="start", type=PlotNodeType.START, title="开始", text="开始"),
+            PlotNode(id="hub", type=PlotNodeType.SCENE, title="选择", text="选择"),
+            PlotNode(id="end", type=PlotNodeType.END, title="结束", text="结束"),
         ],
         edges=[
-            StoryEdge(id="e1", from_node="start", to="hub", kind=EdgeKind.AUTO),
-            StoryEdge(id="e2", from_node="hub", to="end", kind=EdgeKind.CHOICE, label="结束"),
+            PlotEdge(id="e1", from_node="start", to="hub", kind=EdgeKind.AUTO),
+            PlotEdge(id="e2", from_node="hub", to="end", kind=EdgeKind.CHOICE, label="结束"),
         ],
     )
-    session = StorySession(graph)
+    session = PlotSession(graph)
     assert session.start().id == "start"
     assert session.advance().id == "hub"
     options = session.get_options()
@@ -95,31 +95,31 @@ def test_story_session_auto_and_choice():
     assert session.is_finished() is True
 
 
-def test_story_session_condition_and_actions():
-    graph = StoryGraph(
+def test_plot_session_condition_and_actions():
+    graph = PlotGraph(
         id="g",
         title="test",
         start_node_id="start",
         nodes=[
-            StoryNode(id="start", type=StoryNodeType.START, title="开始", text="开始"),
-            StoryNode(
+            PlotNode(id="start", type=PlotNodeType.START, title="开始", text="开始"),
+            PlotNode(
                 id="locked",
-                type=StoryNodeType.SCENE,
+                type=PlotNodeType.SCENE,
                 title="锁",
                 text="锁",
                 enter_actions=[SetFlagAction(kind="setFlag", flag="visited_locked", value=True)],
             ),
-            StoryNode(id="end", type=StoryNodeType.END, title="结束", text="结束"),
+            PlotNode(id="end", type=PlotNodeType.END, title="结束", text="结束"),
         ],
         edges=[
-            StoryEdge(
+            PlotEdge(
                 id="e1",
                 from_node="start",
                 to="locked",
                 kind=EdgeKind.CONDITION,
                 condition=FlagCondition(kind="flag", flag="has_key", op="exists"),
             ),
-            StoryEdge(
+            PlotEdge(
                 id="e2",
                 from_node="start",
                 to="end",
@@ -128,7 +128,7 @@ def test_story_session_condition_and_actions():
             ),
         ],
     )
-    session = StorySession(graph)
+    session = PlotSession(graph)
     # 没有 key 时，条件边不可走
     assert session.get_available_edges()[0].id == "e2"
     session.set_flag("has_key", True)
@@ -138,26 +138,26 @@ def test_story_session_condition_and_actions():
     assert session.get_flag("visited_locked") is True
 
 
-def test_story_session_snapshot_restore():
+def test_plot_session_snapshot_restore():
     graph = load_graph()
-    session = StorySession(graph)
+    session = PlotSession(graph)
     session.start()
     session.advance()
     session.set_flag("test", 1)
     snap = session.snapshot()
-    restored = StorySession(graph)
+    restored = PlotSession(graph)
     restored.restore(snap)
     assert restored.current_node_id == session.current_node_id
     assert restored.get_flag("test") == 1
 
 
-def test_story_agent_context_build_prompt():
+def test_coc_agent_context_build_prompt():
     module = load_module()
     graph = module.graph
-    session = StorySession(graph)
+    session = PlotSession(graph)
     session.start()
     session.advance()
-    context = StoryAgentContext(module, session)
+    context = CocAgentContext(module, session)
     prompt = context.build_prompt()
     assert "《鬼屋》" in prompt
     assert "当前场景" in prompt

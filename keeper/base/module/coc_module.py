@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""模组包：StoryModule。"""
+"""模组包：CocModule。"""
 from __future__ import annotations
 
 from typing import Any, Optional
@@ -7,21 +7,21 @@ from typing import Any, Optional
 from pydantic import PrivateAttr
 
 from keeper.base.creature import Creature
-from keeper.base.story.model import (
+from keeper.base.module.model import (
     ClueCard,
     HandoutCard,
     ItemCard,
     NpcCard,
     Secret,
-    StoryModuleData,
-    StoryValidation,
+    CocModuleData,
+    PlotValidation,
 )
-from keeper.base.story.story_graph import StoryGraph
+from keeper.base.module.plot_graph import PlotGraph
 
-class StoryModule(StoryModuleData):
+class CocModule(CocModuleData):
     """模组包：加载全部素材，提供索引与按需检索。"""
 
-    graph: StoryGraph
+    graph: PlotGraph
 
     _npc_index: Optional[dict[str, NpcCard]] = PrivateAttr(default=None)
     _creature_index: Optional[dict[str, Creature]] = PrivateAttr(default=None)
@@ -91,7 +91,7 @@ class StoryModule(StoryModuleData):
             "secrets": secrets,
         }
 
-    def validate(self) -> StoryValidation:
+    def validate(self) -> PlotValidation:
         errors: list[str] = []
         warnings: list[str] = []
 
@@ -132,11 +132,11 @@ class StoryModule(StoryModuleData):
             if handout.given_by and handout.given_by not in node_ids:
                 errors.append(f"Handout {handout.id} 引用了不存在的节点 {handout.given_by}")
 
-        return StoryValidation(ok=not errors, errors=errors, warnings=warnings)
+        return PlotValidation(ok=not errors, errors=errors, warnings=warnings)
 
     def to_json(self) -> dict[str, Any]:
         return self.model_dump(by_alias=True, mode="json")
 
     @classmethod
-    def from_json(cls, data: dict[str, Any]) -> "StoryModule":
+    def from_json(cls, data: dict[str, Any]) -> "CocModule":
         return cls.model_validate(data)

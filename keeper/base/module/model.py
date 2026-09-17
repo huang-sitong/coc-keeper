@@ -19,7 +19,7 @@ from keeper.base.module_base import ModuleBaseModel
 # ==================== 基础类型 ====================
 
 
-class StoryNodeType(str, Enum):
+class PlotNodeType(str, Enum):
     """节点类型。"""
 
     START = "start"
@@ -71,7 +71,7 @@ class CustomAction(ModuleBaseModel):
     payload: Any = None
 
 
-StoryAction = Annotated[
+PlotAction = Annotated[
     Union[SetFlagAction, IncFlagAction, ClearFlagAction, CustomAction],
     Field(discriminator="kind"),
 ]
@@ -136,19 +136,19 @@ Condition = Annotated[
 # ==================== 节点与边 ====================
 
 
-class StoryNode(ModuleBaseModel):
+class PlotNode(ModuleBaseModel):
     """故事节点：场景/剧情段。"""
 
     id: str
-    type: StoryNodeType
+    type: PlotNodeType
     title: str
     text: str
-    enter_actions: list[StoryAction] = Field(default_factory=list, alias="enterActions")
-    exit_actions: list[StoryAction] = Field(default_factory=list, alias="exitActions")
+    enter_actions: list[PlotAction] = Field(default_factory=list, alias="enterActions")
+    exit_actions: list[PlotAction] = Field(default_factory=list, alias="exitActions")
     metadata: dict[str, Any] = Field(default_factory=dict)
 
 
-class StoryEdge(ModuleBaseModel):
+class PlotEdge(ModuleBaseModel):
     """故事边：节点间转移。"""
 
     id: str
@@ -161,18 +161,18 @@ class StoryEdge(ModuleBaseModel):
     metadata: dict[str, Any] = Field(default_factory=dict)
 
 
-class StoryGraphData(ModuleBaseModel):
+class PlotGraphData(ModuleBaseModel):
     """故事图 JSON 数据形态。"""
 
     id: str
     title: str
     description: str = ""
     start_node_id: str = Field(alias="startNodeId")
-    nodes: list[StoryNode] = Field(default_factory=list)
-    edges: list[StoryEdge] = Field(default_factory=list)
+    nodes: list[PlotNode] = Field(default_factory=list)
+    edges: list[PlotEdge] = Field(default_factory=list)
 
 
-class StoryValidation(ModuleBaseModel):
+class PlotValidation(ModuleBaseModel):
     """校验结果。"""
 
     ok: bool
@@ -184,7 +184,7 @@ class StoryValidation(ModuleBaseModel):
 # ==================== 运行时会话 ====================
 
 
-class StorySnapshot(ModuleBaseModel):
+class PlotSnapshot(ModuleBaseModel):
     """会话存档。"""
 
     current_node_id: str = Field(alias="currentNodeId")
@@ -193,19 +193,19 @@ class StorySnapshot(ModuleBaseModel):
     flags: dict[str, FlagValue] = Field(default_factory=dict)
 
 
-class StoryOption(ModuleBaseModel):
+class PlotOption(ModuleBaseModel):
     """玩家可见选项。"""
 
     edge_id: str = Field(alias="edgeId")
     label: str
-    edge: StoryEdge
+    edge: PlotEdge
 
 
 
 # ==================== 模组素材 ====================
 
 
-class StoryMeta(ModuleBaseModel):
+class CocMeta(ModuleBaseModel):
     """模组元信息。"""
 
     id: str
@@ -284,11 +284,11 @@ class Secret(ModuleBaseModel):
     related_clue_ids: list[str] = Field(default_factory=list, alias="relatedClueIds")
 
 
-class StoryModuleData(ModuleBaseModel):
+class CocModuleData(ModuleBaseModel):
     """模组总包：流程 + 素材。"""
 
-    meta: StoryMeta
-    graph: StoryGraphData
+    meta: CocMeta
+    graph: PlotGraphData
     npcs: list[NpcCard] = Field(default_factory=list)
     creatures: list[_Creature] = Field(default_factory=list)
     items: list[ItemCard] = Field(default_factory=list)

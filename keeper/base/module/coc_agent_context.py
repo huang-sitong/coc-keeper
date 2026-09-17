@@ -1,24 +1,24 @@
 # -*- coding: utf-8 -*-
-"""Agent 上下文组装：StoryAgentContext。"""
+"""Agent 上下文组装：CocAgentContext。"""
 from __future__ import annotations
 
 from typing import Any, Literal, Optional
 
-from keeper.base.story.model import (
+from keeper.base.module.model import (
     AgentContextOptions,
     ClueCard,
     Visibility,
 )
-from keeper.base.story.story_module import StoryModule
-from keeper.base.story.story_session import StorySession
+from keeper.base.module.coc_module import CocModule
+from keeper.base.module.plot_session import PlotSession
 
-class StoryAgentContext:
+class CocAgentContext:
     """把模组素材 + 运行状态组装成给 LLM 的上下文。"""
 
     def __init__(
         self,
-        module: StoryModule,
-        session: StorySession,
+        module: CocModule,
+        session: PlotSession,
         options: Optional[AgentContextOptions | dict[str, Any]] = None,
     ) -> None:
         self.module = module

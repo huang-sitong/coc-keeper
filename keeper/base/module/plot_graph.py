@@ -1,27 +1,27 @@
 # -*- coding: utf-8 -*-
-"""故事图：StoryGraph。"""
+"""故事图：PlotGraph。"""
 from __future__ import annotations
 
 from typing import Any, Optional
 
 from pydantic import PrivateAttr
 
-from keeper.base.story.model import (
+from keeper.base.module.model import (
     EdgeKind,
-    StoryEdge,
-    StoryGraphData,
-    StoryNode,
-    StoryNodeType,
-    StoryValidation,
+    PlotEdge,
+    PlotGraphData,
+    PlotNode,
+    PlotNodeType,
+    PlotValidation,
 )
 
-class StoryGraph(StoryGraphData):
+class PlotGraph(PlotGraphData):
     """故事流程图：只描述结构，不保存运行状态。"""
 
-    _node_index: Optional[dict[str, StoryNode]] = PrivateAttr(default=None)
-    _edge_index: Optional[dict[str, StoryEdge]] = PrivateAttr(default=None)
-    _from_index: Optional[dict[str, list[StoryEdge]]] = PrivateAttr(default=None)
-    _to_index: Optional[dict[str, list[StoryEdge]]] = PrivateAttr(default=None)
+    _node_index: Optional[dict[str, PlotNode]] = PrivateAttr(default=None)
+    _edge_index: Optional[dict[str, PlotEdge]] = PrivateAttr(default=None)
+    _from_index: Optional[dict[str, list[PlotEdge]]] = PrivateAttr(default=None)
+    _to_index: Optional[dict[str, list[PlotEdge]]] = PrivateAttr(default=None)
 
     # ---------- 索引 ----------
 
@@ -47,29 +47,29 @@ class StoryGraph(StoryGraphData):
 
     # ---------- 查询 ----------
 
-    def get_node(self, node_id: str) -> Optional[StoryNode]:
+    def get_node(self, node_id: str) -> Optional[PlotNode]:
         self._ensure_indexes()
         return self._node_index.get(node_id)  # type: ignore[union-attr]
 
-    def get_edge(self, edge_id: str) -> Optional[StoryEdge]:
+    def get_edge(self, edge_id: str) -> Optional[PlotEdge]:
         self._ensure_indexes()
         return self._edge_index.get(edge_id)  # type: ignore[union-attr]
 
-    def get_start_node(self) -> StoryNode:
+    def get_start_node(self) -> PlotNode:
         node = self.get_node(self.start_node_id)
         if node is None:
             raise KeyError(f"start node not found: {self.start_node_id}")
         return node
 
-    def get_outgoing_edges(self, node_id: str) -> list[StoryEdge]:
+    def get_outgoing_edges(self, node_id: str) -> list[PlotEdge]:
         self._ensure_indexes()
         return list(self._from_index.get(node_id, []))  # type: ignore[union-attr]
 
-    def get_incoming_edges(self, node_id: str) -> list[StoryEdge]:
+    def get_incoming_edges(self, node_id: str) -> list[PlotEdge]:
         self._ensure_indexes()
         return list(self._to_index.get(node_id, []))  # type: ignore[union-attr]
 
-    def get_choice_options(self, node_id: str) -> list[StoryEdge]:
+    def get_choice_options(self, node_id: str) -> list[PlotEdge]:
         return [
             e
             for e in self.get_outgoing_edges(node_id)
@@ -78,7 +78,7 @@ class StoryGraph(StoryGraphData):
 
     # ---------- 增删改 ----------
 
-    def add_node(self, node: StoryNode) -> bool:
+    def add_node(self, node: PlotNode) -> bool:
         if self.get_node(node.id) is not None:
             return False
         self.nodes.append(node)
@@ -106,7 +106,7 @@ class StoryGraph(StoryGraphData):
         self._invalidate_indexes()
         return True
 
-    def add_edge(self, edge: StoryEdge) -> bool:
+    def add_edge(self, edge: PlotEdge) -> bool:
         if self.get_edge(edge.id) is not None:
             return False
         if self.get_node(edge.from_node) is None or self.get_node(edge.to) is None:
@@ -135,7 +135,7 @@ class StoryGraph(StoryGraphData):
 
     # ---------- 校验 / 序列化 ----------
 
-    def validate(self) -> StoryValidation:
+    def validate(self) -> PlotValidation:
         errors: list[str] = []
         warnings: list[str] = []
 
@@ -155,21 +155,21 @@ class StoryGraph(StoryGraphData):
             if self.get_node(e.to) is None:
                 errors.append(f"边 {e.id} 的 to 节点不存在: {e.to}")
 
-        start_count = sum(1 for n in self.nodes if n.type == StoryNodeType.START)
+        start_count = sum(1 for n in self.nodes if n.type == PlotNodeType.START)
         if start_count == 0:
             errors.append("缺少 START 节点")
         elif start_count > 1:
             warnings.append(f"存在多个 START 节点: {start_count}")
 
         for n in self.nodes:
-            if n.type != StoryNodeType.END and not self.get_outgoing_edges(n.id):
+            if n.type != PlotNodeType.END and not self.get_outgoing_edges(n.id):
                 warnings.append(f"非 END 节点没有出边: {n.id}")
 
-        return StoryValidation(ok=not errors, errors=errors, warnings=warnings)
+        return PlotValidation(ok=not errors, errors=errors, warnings=warnings)
 
     def to_json(self) -> dict[str, Any]:
         return self.model_dump(by_alias=True, mode="json")
 
     @classmethod
-    def from_json(cls, data: dict[str, Any]) -> "StoryGraph":
+    def from_json(cls, data: dict[str, Any]) -> "PlotGraph":
         return cls.model_validate(data)

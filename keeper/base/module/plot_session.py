@@ -1,31 +1,31 @@
 # -*- coding: utf-8 -*-
-"""故事运行时会话：StorySession。"""
+"""故事运行时会话：PlotSession。"""
 from __future__ import annotations
 
 import random
 from typing import Any, Callable, Optional
 
 from keeper.base.investigator import Investigator
-from keeper.base.story.model import (
+from keeper.base.module.model import (
     CheckCondition,
     CustomAction,
     EdgeKind,
     FlagCondition,
-    StoryAction,
-    StoryEdge,
-    StoryNode,
-    StoryNodeType,
-    StoryOption,
-    StorySnapshot,
+    PlotAction,
+    PlotEdge,
+    PlotNode,
+    PlotNodeType,
+    PlotOption,
+    PlotSnapshot,
 )
-from keeper.base.story.story_graph import StoryGraph
+from keeper.base.module.plot_graph import PlotGraph
 
-class StorySession:
+class PlotSession:
     """单局游戏状态：游标、历史、flag、条件求值。"""
 
     def __init__(
         self,
-        graph: StoryGraph,
+        graph: PlotGraph,
         init: Optional[dict[str, Any]] = None,
     ) -> None:
         init = init or {}
@@ -46,7 +46,7 @@ class StorySession:
 
     # ---------- 状态 ----------
 
-    def start(self, clear_flags: bool = True) -> StoryNode:
+    def start(self, clear_flags: bool = True) -> PlotNode:
         self.visited = []
         self.visit_count = {}
         if clear_flags:
@@ -55,18 +55,18 @@ class StorySession:
         self._record_visit()
         return self.get_current()
 
-    def get_current(self) -> StoryNode:
+    def get_current(self) -> PlotNode:
         node = self.graph.get_node(self.current_node_id)
         if node is None:
             raise KeyError(f"current node not found: {self.current_node_id}")
         return node
 
     def is_finished(self) -> bool:
-        return self.get_current().type == StoryNodeType.END
+        return self.get_current().type == PlotNodeType.END
 
     # ---------- 查询可走边 ----------
 
-    def get_available_edges(self) -> list[StoryEdge]:
+    def get_available_edges(self) -> list[PlotEdge]:
         edges = [
             e
             for e in self.graph.get_outgoing_edges(self.current_node_id)
@@ -75,16 +75,16 @@ class StorySession:
         edges.sort(key=lambda e: e.priority, reverse=True)
         return edges
 
-    def get_options(self) -> list[StoryOption]:
+    def get_options(self) -> list[PlotOption]:
         options = []
         for e in self.get_available_edges():
             if e.kind == EdgeKind.CHOICE and e.label:
-                options.append(StoryOption(edge_id=e.id, label=e.label, edge=e))
+                options.append(PlotOption(edge_id=e.id, label=e.label, edge=e))
         return options
 
     # ---------- 流转 ----------
 
-    def choose(self, edge_id: str) -> StoryNode:
+    def choose(self, edge_id: str) -> PlotNode:
         edge = self.graph.get_edge(edge_id)
         if edge is None:
             raise KeyError(f"edge not found: {edge_id}")
@@ -103,7 +103,7 @@ class StorySession:
         self._record_visit()
         return target
 
-    def advance(self, max_steps: int = 100) -> Optional[StoryNode]:
+    def advance(self, max_steps: int = 100) -> Optional[PlotNode]:
         moved = False
         for _ in range(max_steps):
             if self.is_finished():
@@ -195,7 +195,7 @@ class StorySession:
 
     # ---------- 动作 ----------
 
-    def _apply_actions(self, actions: list[StoryAction]) -> None:
+    def _apply_actions(self, actions: list[PlotAction]) -> None:
         for action in actions:
             if action.kind == "setFlag":
                 self.flags[action.flag] = action.value
@@ -217,15 +217,15 @@ class StorySession:
 
     # ---------- 存档 / 读档 ----------
 
-    def snapshot(self) -> StorySnapshot:
-        return StorySnapshot(
+    def snapshot(self) -> PlotSnapshot:
+        return PlotSnapshot(
             current_node_id=self.current_node_id,
             visited=list(self.visited),
             visit_count=dict(self.visit_count),
             flags=dict(self.flags),
         )
 
-    def restore(self, snapshot: StorySnapshot) -> None:
+    def restore(self, snapshot: PlotSnapshot) -> None:
         self.current_node_id = snapshot.current_node_id
         self.visited = list(snapshot.visited)
         self.visit_count = dict(snapshot.visit_count)

@@ -12,6 +12,10 @@ keeper/
 │   ├── entities.py      # Friend / Group / GroupMember / Permission
 │   ├── adapter.py       # AbstractMessagePlatformAdapter / Converter
 │   ├── event_logger.py  # 日志接口
+│   ├── module_base.py   # ModuleBaseModel（snake_case + camelCase alias）
+│   ├── investigator/    # COC7 调查员数据模型
+│   ├── creature/        # 敌人/怪物数据模型
+│   ├── module/          # 剧情图（PlotGraph/PlotSession）+ 模组素材（CocModule/CocAgentContext）
 │   └── utils/           # httpclient / image 等基础工具
 ├── layer1/
 │   └── platform/   # 整个平台消息收发包（对应 LangBot pkg/platform）

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """COC 故事流程图 / 模组素材包。"""
-from keeper.base.story.model import (
+from keeper.base.module.model import (
     AgentContextOptions,
     AllCondition,
     AlwaysCondition,
@@ -22,23 +22,23 @@ from keeper.base.story.model import (
     RandomCondition,
     Secret,
     SetFlagAction,
-    StoryAction,
-    StoryEdge,
-    StoryGraphData,
-    StoryMeta,
-    StoryModuleData,
-    StoryNode,
-    StoryNodeType,
-    StoryOption,
-    StorySnapshot,
-    StoryValidation,
+    PlotAction,
+    PlotEdge,
+    PlotGraphData,
+    CocMeta,
+    CocModuleData,
+    PlotNode,
+    PlotNodeType,
+    PlotOption,
+    PlotSnapshot,
+    PlotValidation,
     Visibility,
 )
 
-from keeper.base.story.story_graph import StoryGraph
-from keeper.base.story.story_session import StorySession
-from keeper.base.story.story_module import StoryModule
-from keeper.base.story.story_agent_context import StoryAgentContext
+from keeper.base.module.plot_graph import PlotGraph
+from keeper.base.module.plot_session import PlotSession
+from keeper.base.module.coc_module import CocModule
+from keeper.base.module.coc_agent_context import CocAgentContext
 
 __all__ = [
     "AgentContextOptions",
@@ -62,19 +62,19 @@ __all__ = [
     "RandomCondition",
     "Secret",
     "SetFlagAction",
-    "StoryAction",
-    "StoryAgentContext",
-    "StoryEdge",
-    "StoryGraph",
-    "StoryGraphData",
-    "StoryMeta",
-    "StoryModule",
-    "StoryModuleData",
-    "StoryNode",
-    "StoryNodeType",
-    "StoryOption",
-    "StorySession",
-    "StorySnapshot",
-    "StoryValidation",
+    "PlotAction",
+    "CocAgentContext",
+    "PlotEdge",
+    "PlotGraph",
+    "PlotGraphData",
+    "CocMeta",
+    "CocModule",
+    "CocModuleData",
+    "PlotNode",
+    "PlotNodeType",
+    "PlotOption",
+    "PlotSession",
+    "PlotSnapshot",
+    "PlotValidation",
     "Visibility",
 ]
