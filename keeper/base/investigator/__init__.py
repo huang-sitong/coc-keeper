@@ -22,7 +22,7 @@ from keeper.base.investigator.model import (
     Stories,
     Weapon,
 )
-from keeper.base.investigator.dice import roll_d100, roll_dice, resolve_check
+from keeper.base.investigator.dice import roll, roll_d100, roll_dice, resolve_check
 from keeper.base.investigator.skill import Skill
 from keeper.base.investigator.skill_groups import SkillGroups
 from keeper.base.investigator.attributes import Attributes
@@ -34,6 +34,7 @@ __all__ = [
     "Difficulty",
     "CheckLevel",
     "CheckResult",
+    "roll",
     "roll_d100",
     "roll_dice",
     "resolve_check",

@@ -4,10 +4,11 @@ import math
 import random
 from typing import Callable
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from keeper.base.investigator.dice import resolve_check, roll_d100
 from keeper.base.investigator.model import CheckResult, Difficulty
+
 
 class Skill(BaseModel):
     """技能条目。
@@ -15,6 +16,8 @@ class Skill(BaseModel):
     占位技能（如“科学:”“外语:”）靠 ``id`` 区分；
     总值与各级成功率均为派生值，不入库。
     """
+
+    model_config = ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     id: str
     name: str
@@ -54,3 +57,15 @@ class Skill(BaseModel):
             return False
         self.growth += math.floor(rng() * 10) + 1
         return True
+
+    # ============ 打印 ============
+
+    def to_markdown(self) -> str:
+        """生成便于展示/注入 LLM 的技能行，如 ``侦查 50%（困难 25 / 极难 10）``。"""
+        return (
+            f"{self.name} {self.total}%"
+            f"（困难 {self.hard_success} / 极难 {self.extreme_success}）"
+        )
+
+    def __str__(self) -> str:
+        return self.to_markdown()

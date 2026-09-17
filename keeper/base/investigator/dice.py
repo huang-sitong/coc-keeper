@@ -7,9 +7,18 @@ from typing import Callable
 
 from keeper.base.investigator.model import CheckLevel, CheckResult, Difficulty
 
+def roll(max_value: int = 100, rng: Callable[[], float] = random.random) -> int:
+    """掷一颗 ``max_value`` 面骰，返回 1 到 ``max_value``（含）的整数。
+
+    默认为 d100，因此 ``roll()`` 等价于掷 d100。
+    """
+    if max_value < 1:
+        raise ValueError("max_value must be >= 1")
+    return math.floor(rng() * max_value) + 1
+
 def roll_d100(rng: Callable[[], float] = random.random) -> int:
     """掷 d100，返回 1-100。"""
-    return math.floor(rng() * 100) + 1
+    return roll(100, rng)
 
 def roll_dice(expr: str, db: str = "0", rng: Callable[[], float] = random.random) -> int:
     """解析掷骰表达式（``2D6+1``、``1D3+DB``）。
@@ -28,9 +37,7 @@ def roll_dice(expr: str, db: str = "0", rng: Callable[[], float] = random.random
         if m:
             times = int(m.group(1)) if m.group(1) else 1
             die = int(m.group(2))
-            s = 0
-            for _ in range(times):
-                s += math.floor(rng() * die) + 1
+            s = sum(roll(die, rng) for _ in range(times))
             total += sign * s
         else:
             total += sign * (int(t) if t else 0)

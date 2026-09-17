@@ -79,6 +79,9 @@ class Investigator(BaseModel):
     def get_attribute(self, name: AttributeName | str) -> int:
         return self.attributes.get(name)
 
+    def set_attribute(self, name: AttributeName | str, value: int) -> None:
+        self.attributes.set(name, value)
+
     def get_weapons_by_skill(self, skill_id: str) -> list[Weapon]:
         return self.weapons.get_weapons_by_skill_id(skill_id)
 
@@ -311,3 +314,52 @@ class Investigator(BaseModel):
         self.battle_attributes.db = self.derive_damage_bonus()
         self.battle_attributes.build = self.derive_build()
         self.battle_attributes.mov = self.derive_mov()
+
+    # ============ 打印 ============
+
+    def to_markdown(self) -> str:
+        """生成便于展示/注入 LLM 的调查员角色卡文本。"""
+        attrs = [
+            f"{name.value.upper()} {self.attributes.get(name)}"
+            for name in AttributeName
+        ]
+        hp = self.derive_attributes.hp
+        mp = self.derive_attributes.mp
+        san = self.derive_attributes.sanity
+        lines = [
+            f"【调查员】{self.name}",
+            f"玩家：{self.player_name}　职业：{self.job}　年龄：{self.age}　性别：{self.gender}",
+            f"时代：{self.era}　住地：{self.location}　故乡：{self.hometown}",
+            f"属性：{'　'.join(attrs)}",
+            f"HP：{hp.current}/{hp.max}　MP：{mp.current}/{mp.max}　SAN：{san.current}/{san.max}",
+            (
+                f"DB：{self.battle_attributes.db}　Build：{self.battle_attributes.build}"
+                f"　MOV：{self.battle_attributes.mov}　护甲：{self.battle_attributes.armor}"
+            ),
+        ]
+        body = self.character_status.get_active_body_states()
+        mental = self.character_status.get_active_mental_states()
+        lines.append(f"身体状态：{'、'.join(body) or '正常'}")
+        lines.append(f"精神状态：{'、'.join(mental) or '正常'}")
+
+        skills = self.skill_groups.get_all_skills()
+        if skills:
+            lines.append("技能：" + "；".join(skill.to_markdown() for skill in skills))
+        if self.weapons.items:
+            lines.append("武器：" + "；".join(w.to_markdown() for w in self.weapons.items))
+
+        story_bits = [
+            self.stories.app,
+            self.stories.belief,
+            self.stories.i_person,
+            self.stories.i_place,
+            self.stories.i_item,
+            self.stories.trait,
+            self.stories.scar,
+            self.stories.mad,
+            self.stories.desc,
+        ]
+        story = [bit for bit in story_bits if bit]
+        if story:
+            lines.append("背景：" + "；".join(story))
+        return "\n".join(lines)

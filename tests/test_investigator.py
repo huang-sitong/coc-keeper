@@ -112,3 +112,57 @@ if __name__ == "__main__":
     test_investigator_damage()
     test_attributes_alias_roundtrip()
     print("all investigator tests passed")
+
+
+def test_attributes_get_set():
+    a = Attributes()
+    a.set("str", 60)
+    a.set(AttributeName.INT, 70)
+    a.set("dex", 40)
+    assert a.get("str") == 60
+    assert a.get(AttributeName.INT) == 70
+    assert a.get("dex") == 40
+    # 别名 / 字段名均可访问
+    assert a.get("str_") == 60
+    import pytest
+
+    with pytest.raises(KeyError):
+        a.set("unknown", 1)
+
+
+def test_skill_weapon_and_investigator_print():
+    skill = Skill(id="s1", name="侦查", base=50)
+    assert str(skill) == "侦查 50%（困难 25 / 极难 10）"
+    assert skill.to_markdown() == str(skill)
+
+    weapon = Weapon(id="w1", name="手枪", damage="1D10", num="12")
+    assert weapon.to_markdown() == "手枪 / 伤害 1D10 / 次数 1 / 弹药 12"
+
+    inv = Investigator(name="诺特", player_name="Alice")
+    inv.set_attribute("str", 50)
+    inv.set_attribute("con", 50)
+    inv.set_attribute("siz", 60)
+    inv.set_attribute("pow", 50)
+    inv.sync_derived()
+    assert inv.get_attribute("str") == 50
+
+    inv.skill_groups.add_skill(SkillGroup.EXPLORE, skill)
+    inv.weapons.add_weapon(Weapon(id="w1", name="手枪", skill_id="s1", damage="1D10"))
+
+    card = inv.to_markdown()
+    assert "【调查员】诺特" in card
+    assert "STR 50" in card
+    assert "侦查 50%" in card
+    assert "手枪" in card
+
+
+if __name__ == "__main__":
+    test_roll_dice_and_resolve_check()
+    test_skill_and_groups()
+    test_weapon_list_index()
+    test_investigator_derived_and_attack()
+    test_investigator_damage()
+    test_attributes_alias_roundtrip()
+    test_attributes_get_set()
+    test_skill_weapon_and_investigator_print()
+    print("all investigator tests passed")
