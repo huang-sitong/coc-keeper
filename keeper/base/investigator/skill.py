@@ -57,15 +57,3 @@ class Skill(BaseModel):
             return False
         self.growth += math.floor(rng() * 10) + 1
         return True
-
-    # ============ 打印 ============
-
-    def to_markdown(self) -> str:
-        """生成便于展示/注入 LLM 的技能行，如 ``侦查 50%（困难 25 / 极难 10）``。"""
-        return (
-            f"{self.name} {self.total}%"
-            f"（困难 {self.hard_success} / 极难 {self.extreme_success}）"
-        )
-
-    def __str__(self) -> str:
-        return self.to_markdown()

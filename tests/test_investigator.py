@@ -57,10 +57,10 @@ def test_weapon_list_index():
 
 def test_investigator_derived_and_attack():
     inv = Investigator(name="测试员")
-    inv.attributes.str = 50
-    inv.attributes.con = 50
-    inv.attributes.siz = 60
-    inv.attributes.pow = 50
+    inv.set_attribute(AttributeName.STR, 50)
+    inv.set_attribute(AttributeName.CON, 50)
+    inv.set_attribute(AttributeName.SIZ, 60)
+    inv.set_attribute(AttributeName.POW, 50)
     inv.sync_derived()
 
     assert inv.derive_attributes.hp.max == 11
@@ -96,9 +96,11 @@ def test_investigator_damage():
 
 
 def test_attributes_alias_roundtrip():
+    # 构造仍可用 JSON 别名 str/int
     attributes = Attributes(**{"str": 10, "int": 12})
-    assert attributes.str == 10
-    assert attributes.int == 12
+    assert attributes.get("str") == 10
+    assert attributes.get("int") == 12
+    # 序列化仍是 str/int 键
     dumped = attributes.model_dump()
     assert dumped["str"] == 10
     assert dumped["int"] == 12
@@ -130,14 +132,16 @@ def test_attributes_get_set():
         a.set("unknown", 1)
 
 
-def test_skill_weapon_and_investigator_print():
+def test_skill_weapon_value_objects_and_investigator_print():
+    # 值对象保留 pydantic 默认 repr/str（调试用，字段完整）
     skill = Skill(id="s1", name="侦查", base=50)
-    assert str(skill) == "侦查 50%（困难 25 / 极难 10）"
-    assert skill.to_markdown() == str(skill)
+    assert "id='s1'" in repr(skill)
+    assert "base=50" in str(skill)
 
     weapon = Weapon(id="w1", name="手枪", damage="1D10", num="12")
-    assert weapon.to_markdown() == "手枪 / 伤害 1D10 / 次数 1 / 弹药 12"
+    assert "damage='1D10'" in repr(weapon)
 
+    # 展示/注入 LLM 只由根对象 Investigator.info 提供
     inv = Investigator(name="诺特", player_name="Alice")
     inv.set_attribute("str", 50)
     inv.set_attribute("con", 50)
@@ -149,7 +153,7 @@ def test_skill_weapon_and_investigator_print():
     inv.skill_groups.add_skill(SkillGroup.EXPLORE, skill)
     inv.weapons.add_weapon(Weapon(id="w1", name="手枪", skill_id="s1", damage="1D10"))
 
-    card = inv.to_markdown()
+    card = inv.info()
     assert "【调查员】诺特" in card
     assert "STR 50" in card
     assert "侦查 50%" in card

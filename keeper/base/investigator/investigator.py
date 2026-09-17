@@ -263,46 +263,53 @@ class Investigator(BaseModel):
         return 99 - self.get_cthulhu_mythos()
 
     def derive_damage_bonus(self) -> str:
-        s = self.attributes.str + self.attributes.siz
-        if s <= 64:
+        total = self.get_attribute(AttributeName.STR) + self.get_attribute(
+            AttributeName.SIZ
+        )
+        if total <= 64:
             return "-2"
-        if s <= 84:
+        if total <= 84:
             return "-1"
-        if s <= 124:
+        if total <= 124:
             return "0"
-        if s <= 164:
+        if total <= 164:
             return "+1d4"
-        if s <= 204:
+        if total <= 204:
             return "+1d6"
-        if s <= 284:
+        if total <= 284:
             return "+2d6"
-        if s <= 364:
+        if total <= 364:
             return "+3d6"
         return "+4d6"
 
     def derive_build(self) -> int:
-        s = self.attributes.str + self.attributes.siz
-        if s <= 64:
+        total = self.get_attribute(AttributeName.STR) + self.get_attribute(
+            AttributeName.SIZ
+        )
+        if total <= 64:
             return -2
-        if s <= 84:
+        if total <= 84:
             return -1
-        if s <= 124:
+        if total <= 124:
             return 0
-        if s <= 164:
+        if total <= 164:
             return 1
-        if s <= 204:
+        if total <= 204:
             return 2
-        if s <= 284:
+        if total <= 284:
             return 3
-        if s <= 364:
+        if total <= 364:
             return 4
         return 5
 
     def derive_mov(self) -> int:
-        str_, siz = self.attributes.str, self.attributes.siz
-        if str_ < 8 and siz < 8:
+        str_value, siz = (
+            self.get_attribute(AttributeName.STR),
+            self.get_attribute(AttributeName.SIZ),
+        )
+        if str_value < 8 and siz < 8:
             return 9
-        if str_ < 12 and siz < 12:
+        if str_value < 12 and siz < 12:
             return 8
         return 7
 
@@ -315,10 +322,10 @@ class Investigator(BaseModel):
         self.battle_attributes.build = self.derive_build()
         self.battle_attributes.mov = self.derive_mov()
 
-    # ============ 打印 ============
+    # ============ 信息输出 ============
 
-    def to_markdown(self) -> str:
-        """生成便于展示/注入 LLM 的调查员角色卡文本。"""
+    def info(self) -> str:
+        """返回便于展示/注入 LLM 的调查员角色卡文本。"""
         attrs = [
             f"{name.value.upper()} {self.attributes.get(name)}"
             for name in AttributeName
@@ -344,9 +351,16 @@ class Investigator(BaseModel):
 
         skills = self.skill_groups.get_all_skills()
         if skills:
-            lines.append("技能：" + "；".join(skill.to_markdown() for skill in skills))
+            lines.append(
+                "技能："
+                + "；".join(
+                    f"{skill.name} {skill.total}%"
+                    f"（困难 {skill.hard_success} / 极难 {skill.extreme_success}）"
+                    for skill in skills
+                )
+            )
         if self.weapons.items:
-            lines.append("武器：" + "；".join(w.to_markdown() for w in self.weapons.items))
+            lines.append("武器：" + "；".join(self._format_weapon(w) for w in self.weapons.items))
 
         story_bits = [
             self.stories.app,
@@ -363,3 +377,19 @@ class Investigator(BaseModel):
         if story:
             lines.append("背景：" + "；".join(story))
         return "\n".join(lines)
+
+    @staticmethod
+    def _format_weapon(weapon: Weapon) -> str:
+        """把武器压成一行易读文本。"""
+        parts = [weapon.name]
+        if weapon.damage:
+            parts.append(f"伤害 {weapon.damage}")
+        if weapon.range:
+            parts.append(f"射程 {weapon.range}")
+        if weapon.tho:
+            parts.append(f"次数 {weapon.tho}")
+        if weapon.num:
+            parts.append(f"弹药 {weapon.num}")
+        if weapon.note:
+            parts.append(f"备注 {weapon.note}")
+        return " / ".join(parts)

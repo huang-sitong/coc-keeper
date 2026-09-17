@@ -176,7 +176,7 @@ def test_creature_profile_detailed():
     module = load_module()
     corbitt = module.get_creature("creature_corbitt")
     assert corbitt is not None
-    assert corbitt.attributes.str == 90
+    assert corbitt.get_attribute("str") == 90
     assert corbitt.hp == 16
     assert corbitt.mp == 18
     assert corbitt.db == "+1D4"

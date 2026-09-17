@@ -163,7 +163,7 @@ class StoryAgentContext:
                 + (f"守密人笔记：{card.keeper_notes or ''}" if self.options.include_keeper_info else "")
             )
         if kind == "creature":
-            return card.to_markdown(self.options.include_keeper_info)
+            return card.info(self.options.include_keeper_info)
         if kind == "item":
             return (
                 f"【物品】{card.name}\n"

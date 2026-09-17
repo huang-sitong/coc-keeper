@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
-"""COC7 属性：Attributes。"""
+"""COC7 属性：Attributes。
+
+统一通过 ``get`` / ``set`` 访问属性，不再暴露 ``str`` / ``int`` 属性名
+（避免与 Python 内建类型重名）；JSON 别名 ``str`` / ``int`` 仅在序列化层
+（``model_dump`` / 构造参数）使用。
+"""
 import random
 from typing import Callable
 
@@ -7,6 +12,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from keeper.base.investigator.dice import resolve_check, roll_d100
 from keeper.base.investigator.model import AttributeName, CheckResult, Difficulty
+
 
 class Attributes(BaseModel):
     """八项基础属性与幸运。"""
@@ -39,6 +45,7 @@ class Attributes(BaseModel):
         raise KeyError(f"unknown attribute: {name}")
 
     def get(self, name: AttributeName | str) -> int:
+        """读取一项基础属性。"""
         return getattr(self, self._resolve_field(name))
 
     def set(self, name: AttributeName | str, value: int) -> None:
@@ -52,19 +59,3 @@ class Attributes(BaseModel):
         rng: Callable[[], float] = random.random,
     ) -> CheckResult:
         return resolve_check(roll_d100(rng), self.get(name), difficulty)
-
-    @property
-    def str(self) -> int:
-        return self.str_
-
-    @str.setter
-    def str(self, value: int) -> None:
-        self.str_ = value
-
-    @property
-    def int(self) -> int:
-        return self.int_
-
-    @int.setter
-    def int(self, value: int) -> None:
-        self.int_ = value

@@ -148,24 +148,6 @@ class Weapon(BaseModel):
     note: str = ""
     success: str = ""
 
-    def to_markdown(self) -> str:
-        """生成便于展示/注入 LLM 的武器行，如 ``手枪 伤害 1D10 / 射程 15m / 次数 1``。"""
-        parts = [self.name]
-        if self.damage:
-            parts.append(f"伤害 {self.damage}")
-        if self.range:
-            parts.append(f"射程 {self.range}")
-        if self.tho:
-            parts.append(f"次数 {self.tho}")
-        if self.num:
-            parts.append(f"弹药 {self.num}")
-        if self.note:
-            parts.append(f"备注 {self.note}")
-        return " / ".join(parts)
-
-    def __str__(self) -> str:
-        return self.to_markdown()
-
 
 class Stories(BaseModel):
     """个人故事与描述。"""

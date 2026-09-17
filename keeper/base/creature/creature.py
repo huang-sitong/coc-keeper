@@ -344,7 +344,7 @@ class Creature(ModuleBaseModel):
 
     # ============ 展示 ============
 
-    def to_markdown(self, include_keeper_info: bool = False) -> str:
+    def info(self, include_keeper_info: bool = False) -> str:
         """生成便于注入 LLM 的敌人卡片文本。"""
         attrs = self.attributes.model_dump(by_alias=True)
         skill_lines = [
@@ -373,13 +373,13 @@ class Creature(ModuleBaseModel):
         return "\n".join(lines)
 
     def describe(self, include_keeper_info: bool = False) -> str:
-        """``to_markdown`` 的语义化别名。"""
-        return self.to_markdown(include_keeper_info)
+        """``info`` 的语义化别名。"""
+        return self.info(include_keeper_info)
 
     def to_prompt(self, include_keeper_info: bool = False) -> str:
-        """``to_markdown`` 的别名，便于 Agent 上下文调用。"""
-        return self.to_markdown(include_keeper_info)
+        """``info`` 的别名，便于 Agent 上下文调用。"""
+        return self.info(include_keeper_info)
 
     def format_card(self, include_keeper_info: bool = False) -> str:
-        """``to_markdown`` 的卡片格式化别名。"""
-        return self.to_markdown(include_keeper_info)
+        """``info`` 的卡片格式化别名。"""
+        return self.info(include_keeper_info)
