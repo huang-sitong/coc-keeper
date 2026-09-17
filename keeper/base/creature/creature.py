@@ -371,15 +371,3 @@ class Creature(ModuleBaseModel):
             if self.sanity_loss:
                 lines.append(f"理智损失：{self.sanity_loss}")
         return "\n".join(lines)
-
-    def describe(self, include_keeper_info: bool = False) -> str:
-        """``info`` 的语义化别名。"""
-        return self.info(include_keeper_info)
-
-    def to_prompt(self, include_keeper_info: bool = False) -> str:
-        """``info`` 的别名，便于 Agent 上下文调用。"""
-        return self.info(include_keeper_info)
-
-    def format_card(self, include_keeper_info: bool = False) -> str:
-        """``info`` 的卡片格式化别名。"""
-        return self.info(include_keeper_info)

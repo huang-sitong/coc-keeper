@@ -166,10 +166,3 @@ class PlotGraph(PlotGraphData):
                 warnings.append(f"非 END 节点没有出边: {n.id}")
 
         return PlotValidation(ok=not errors, errors=errors, warnings=warnings)
-
-    def to_json(self) -> dict[str, Any]:
-        return self.model_dump(by_alias=True, mode="json")
-
-    @classmethod
-    def from_json(cls, data: dict[str, Any]) -> "PlotGraph":
-        return cls.model_validate(data)

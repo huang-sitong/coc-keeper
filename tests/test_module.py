@@ -19,12 +19,12 @@ from keeper.base.module import (
 
 def load_graph() -> PlotGraph:
     path = Path(__file__).resolve().parents[1] / ".docs" / "HauntingStoryGraph.json"
-    return PlotGraph.from_json(json.loads(path.read_text(encoding="utf-8")))
+    return PlotGraph.model_validate(json.loads(path.read_text(encoding="utf-8")))
 
 
 def load_module() -> CocModule:
     path = Path(__file__).resolve().parents[1] / ".docs" / "HauntingStoryModule.json"
-    return CocModule.from_json(json.loads(path.read_text(encoding="utf-8")))
+    return CocModule.model_validate(json.loads(path.read_text(encoding="utf-8")))
 
 
 def test_load_haunting_graph():
