@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-"""COC7 检定与掷骰函数。"""
+"""通用掷骰函数：d100、骰式解析与 DB 替换。"""
 import math
 import random
 import re
 from typing import Callable
 
-from keeper.base.investigator.model import CheckLevel, CheckResult, Difficulty
 
 def roll(max_value: int = 100, rng: Callable[[], float] = random.random) -> int:
     """掷一颗 ``max_value`` 面骰，返回 1 到 ``max_value``（含）的整数。
@@ -16,9 +15,11 @@ def roll(max_value: int = 100, rng: Callable[[], float] = random.random) -> int:
         raise ValueError("max_value must be >= 1")
     return math.floor(rng() * max_value) + 1
 
+
 def roll_d100(rng: Callable[[], float] = random.random) -> int:
     """掷 d100，返回 1-100。"""
     return roll(100, rng)
+
 
 def roll_dice(expr: str, db: str = "0", rng: Callable[[], float] = random.random) -> int:
     """解析掷骰表达式（``2D6+1``、``1D3+DB``）。
@@ -42,30 +43,3 @@ def roll_dice(expr: str, db: str = "0", rng: Callable[[], float] = random.random
         else:
             total += sign * (int(t) if t else 0)
     return total
-
-def resolve_check(
-    roll: int,
-    value: int,
-    difficulty: Difficulty = Difficulty.NORMAL,
-) -> CheckResult:
-    """COC7 检定裁决（技能/属性共用）。"""
-    if difficulty == Difficulty.HARD:
-        target = math.floor(value / 2)
-    elif difficulty == Difficulty.EXTREME:
-        target = math.floor(value / 5)
-    else:
-        target = value
-
-    if roll == 100 or (roll >= 96 and value < 50):
-        return CheckResult(roll=roll, target=target, success=False, level="fumble")
-    if roll <= 5 and roll <= value:
-        return CheckResult(roll=roll, target=target, success=True, level="critical")
-    if roll <= target:
-        if difficulty == Difficulty.EXTREME:
-            level: CheckLevel = "extreme"
-        elif difficulty == Difficulty.HARD:
-            level = "hard"
-        else:
-            level = "success"
-        return CheckResult(roll=roll, target=target, success=True, level=level)
-    return CheckResult(roll=roll, target=target, success=False, level="fail")

@@ -8,20 +8,17 @@ from typing import Callable, Optional
 
 from pydantic import Field
 
+from keeper.base.dice import CheckResult, Difficulty, roll_d100, roll_dice
 from keeper.base.investigator import (
     AttributeName,
     AttackBySkillResult,
     AttackResult,
     Attributes,
-    CheckResult,
     DamageResult,
-    Difficulty,
     Skill,
     SkillGroups,
     Weapon,
     WeaponList,
-    roll_d100,
-    roll_dice,
 )
 from keeper.base.module_base import ModuleBaseModel
 from keeper.base.creature.model import ArmorRollResult, SanityLossResult

@@ -9,17 +9,15 @@ from pydantic import BaseModel, Field
 
 from keeper.base.investigator.attributes import Attributes
 from keeper.base.investigator.character_status import CharacterStatus
-from keeper.base.investigator.dice import roll_d100, roll_dice
+from keeper.base.dice import CheckResult, Difficulty, roll_d100, roll_dice
 from keeper.base.investigator.model import (
     Assets,
     AttributeName,
     AttackBySkillResult,
     AttackResult,
     BattleAttributes,
-    CheckResult,
     DamageResult,
     DeriveAttributes,
-    Difficulty,
     ExperiencedModule,
     Friend,
     Stories,

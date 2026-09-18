@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """COC7 调查员数据模型包。"""
+from keeper.base.dice import CheckLevel, CheckResult, Difficulty, resolve_check
 from keeper.base.investigator.model import (
     AttackBySkillResult,
     AttackResult,
@@ -7,11 +8,8 @@ from keeper.base.investigator.model import (
     Assets,
     BattleAttributes,
     BodyStates,
-    CheckLevel,
-    CheckResult,
     DamageResult,
     DeriveAttributes,
-    Difficulty,
     ExperiencedModule,
     Friend,
     HitPoints,
@@ -22,7 +20,6 @@ from keeper.base.investigator.model import (
     Stories,
     Weapon,
 )
-from keeper.base.investigator.dice import roll, roll_d100, roll_dice, resolve_check
 from keeper.base.investigator.skill import Skill
 from keeper.base.investigator.skill_groups import SkillGroups
 from keeper.base.investigator.attributes import Attributes
@@ -32,12 +29,9 @@ from keeper.base.investigator.investigator import Investigator
 
 __all__ = [
     "Difficulty",
+    "resolve_check",
     "CheckLevel",
     "CheckResult",
-    "roll",
-    "roll_d100",
-    "roll_dice",
-    "resolve_check",
     "AttackResult",
     "AttackBySkillResult",
     "DamageResult",

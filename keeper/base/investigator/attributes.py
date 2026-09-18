@@ -10,8 +10,8 @@ from typing import Callable
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from keeper.base.investigator.dice import resolve_check, roll_d100
-from keeper.base.investigator.model import AttributeName, CheckResult, Difficulty
+from keeper.base.dice import CheckResult, Difficulty, resolve_check, roll_d100
+from keeper.base.investigator.model import AttributeName
 
 
 class Attributes(BaseModel):

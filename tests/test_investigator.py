@@ -1,16 +1,14 @@
 """COC7 调查员数据模型基础自检。"""
+from keeper.base.dice import Difficulty, resolve_check, roll_dice
 from keeper.base.investigator import (
     AttributeName,
     Attributes,
-    Difficulty,
     Investigator,
     Skill,
     SkillGroup,
     SkillGroups,
     Weapon,
     WeaponList,
-    resolve_check,
-    roll_dice,
 )
 
 

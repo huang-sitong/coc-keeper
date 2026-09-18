@@ -6,8 +6,7 @@ from typing import Callable
 
 from pydantic import BaseModel, ConfigDict
 
-from keeper.base.investigator.dice import resolve_check, roll_d100
-from keeper.base.investigator.model import CheckResult, Difficulty
+from keeper.base.dice import CheckResult, Difficulty, resolve_check, roll_d100
 
 
 class Skill(BaseModel):

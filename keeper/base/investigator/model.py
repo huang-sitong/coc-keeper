@@ -1,26 +1,15 @@
 # -*- coding: utf-8 -*-
-"""COC7 调查员数据模型：纯数据类。"""
-from enum import Enum, IntEnum
-from typing import Literal, Optional
+"""COC7 调查员数据模型：纯数据类。
+
+检定类型（``Difficulty`` / ``CheckResult`` / ``CheckLevel``）定义在
+``keeper.base.dice``，此处 re-export 以保持既有导入路径兼容。
+"""
+from enum import Enum
+from typing import Optional
 
 from pydantic import BaseModel, Field
 
-CheckLevel = Literal["critical", "extreme", "hard", "success", "fail", "fumble"]
-
-class Difficulty(IntEnum):
-    """检定难度。"""
-
-    NORMAL = 0
-    HARD = 1
-    EXTREME = 2
-
-class CheckResult(BaseModel):
-    """一次 d100 检定的结果。"""
-
-    roll: int
-    target: int
-    success: bool
-    level: CheckLevel
+from keeper.base.dice.model import CheckLevel, CheckResult, Difficulty  # re-export for compatibility
 
 class AttackResult(BaseModel):
     """攻击命中后的结算结果。"""

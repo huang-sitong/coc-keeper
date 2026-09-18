@@ -12,7 +12,8 @@ from typing import Annotated, Any, Literal, Optional, Union
 from pydantic import Field
 
 from keeper.base.creature import Creature as _Creature
-from keeper.base.investigator import AttributeName, Difficulty
+from keeper.base.dice import Difficulty
+from keeper.base.investigator import AttributeName
 from keeper.base.module_base import ModuleBaseModel
 
 
