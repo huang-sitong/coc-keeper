@@ -10,3 +10,5 @@ wheels/
 .venv
 
 keeper.yaml
+
+keeper/base/_investigator
