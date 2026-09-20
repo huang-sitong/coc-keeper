@@ -8,16 +8,35 @@ class Attributes(BaseModel):
 
     model_config = ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    _str: int = Field(default=0, alias="str")
-    _dex: int = Field(default=0, alias="dex")
-    _con: int = Field(default=0, alias="con")
-    _app: int = Field(default=0, alias="app")
-    _pow: int = Field(default=0, alias="pow")
-    _siz: int = Field(default=0, alias="siz")
-    _edu: int = Field(default=0, alias="edu")
-    _int: int = Field(default=0, alias="int")
+    str_: int = Field(default=0, alias="str")
+    dex_: int = Field(default=0, alias="dex")
+    con_: int = Field(default=0, alias="con")
+    app_: int = Field(default=0, alias="app")
+    pow_: int = Field(default=0, alias="pow")
+    siz_: int = Field(default=0, alias="siz")
+    edu_: int = Field(default=0, alias="edu")
+    int_: int = Field(default=0, alias="int")
 
-    _luc: int = Field(default=0, alias="luc")
+    luc_: int = Field(default=0, alias="luc")
+    # ---- 通用读写 ----
+
+    @classmethod
+    def _resolve(cls, attr: str) -> str:
+        """把别名（'str'）或字段名（'str_'）统一解析成字段名。"""
+        # 先按字段名匹配
+        if attr in cls.model_fields:
+            return attr
+        # 再按 alias 匹配
+        for name, f in cls.model_fields.items():
+            if f.alias == attr:
+                return name
+        raise KeyError(f"未知属性: {attr!r}")
+
+    def get(self, attr: str) -> int:
+        return getattr(self, self._resolve(attr))
+
+    def set(self, attr: str, value: int) -> None:
+        setattr(self, self._resolve(attr), value)
 
 # DeriveAttributes
 
@@ -58,6 +77,11 @@ class BattleAttributes(BaseModel):
 
 # skills
 
+_GROUP_NAMES = (
+    "special", "explore", "social", "combat", "medical",
+    "move", "knowledge", "tech", "drive", "other",
+)
+
 class Skill(BaseModel):
 
     name: str = ""
@@ -68,7 +92,6 @@ class Skill(BaseModel):
     is_professional: bool = False
 
 class SkillGroups(BaseModel):
-    #TODO 为SkillGroups添加索引_index
 
     special: list[Skill] = Field(default_factory=list)
     explore: list[Skill] = Field(default_factory=list)
@@ -80,7 +103,51 @@ class SkillGroups(BaseModel):
     tech: list[Skill] = Field(default_factory=list)
     drive: list[Skill] = Field(default_factory=list)
     other: list[Skill] = Field(default_factory=list)
+    # name -> (group, index)
+    _index: dict[str, tuple[str, int]] = PrivateAttr(default_factory=dict)
 
+    def model_post_init(self, __context) -> None:
+        self.update_index()
+
+    # ---------------- 索引维护 ----------------
+
+    def update_index(self) -> None:
+        """全量重建索引。任何直接改动分组列表后都应调用。"""
+        idx: dict[str, tuple[str, int]] = {}
+        for group in _GROUP_NAMES:
+            for i, skill in enumerate(getattr(self, group)):
+                if skill.name in idx:
+                    raise ValueError(f"技能名重复: {skill.name!r}")
+                idx[skill.name] = (group, i)
+        self._index = idx
+
+    # ---------------- 读写 ----------------
+
+    def get(self, name: str) -> Skill | None:
+        """按名称取技能。不存在返回 None。"""
+        loc = self._index.get(name)
+        if loc is None:
+            return None
+        group, i = loc
+        return getattr(self, group)[i]
+
+    def set(self, group: str, skill: Skill) -> None:
+        """
+        在指定分组中写入技能：
+          - 若同名技能已存在（可能在别的分组），先移除旧的；
+          - 再把新的追加到目标分组末尾；
+          - 最后重建索引。
+        """
+        if group not in _GROUP_NAMES:
+            raise KeyError(f"未知分组: {group!r}")
+
+        loc = self._index.get(skill.name)
+        if loc is not None:
+            old_group, old_i = loc
+            getattr(self, old_group).pop(old_i)
+
+        getattr(self, group).append(skill)
+        self.update_index()
 # end
 
 class Weapon(BaseModel):
