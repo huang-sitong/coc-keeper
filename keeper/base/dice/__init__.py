@@ -6,7 +6,7 @@
 - ``resolve_check``：COC7 检定裁决。
 """
 from keeper.base.dice.model import CheckLevel, CheckResult, Difficulty
-from keeper.base.dice.roll import roll, roll_ndm
+from keeper.base.dice.roll import roll_dn, roll_ndice
 from keeper.base.dice.check import resolve_check
 
 __all__ = [
@@ -14,6 +14,6 @@ __all__ = [
     "CheckResult",
     "Difficulty",
     "resolve_check",
-    "roll",
-    "roll_ndm",
+    "roll_dn",
+    "roll_ndice",
 ]
