@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, PrivateAttr
 
 class Attributes(BaseModel):
     """八项基础属性与幸运。"""
@@ -24,14 +24,14 @@ class Attributes(BaseModel):
 class Sanity(BaseModel):
     """理智值。"""
 
-    current: int = 0
+    current: int = 1
     max: int = 99
 
 class HitPoints(BaseModel):
     """生命值。"""
 
-    current: int = 0
-    max: int = 0
+    current: int = 1
+    max: int = 1
 
 class MagicPoints(BaseModel):
     """魔法值。"""
@@ -60,7 +60,7 @@ class BattleAttributes(BaseModel):
 
 class Skill(BaseModel):
 
-    name: str
+    name: str = ""
     base: int = 0
     job: int = 0
     interest: int = 0
@@ -86,8 +86,7 @@ class SkillGroups(BaseModel):
 class Weapon(BaseModel):
     """武器条目"""
 
-    id: str
-    name: str
+    name: str = ""
     skill: str = ""
     skill_id: str = ""
     damage: str = ""

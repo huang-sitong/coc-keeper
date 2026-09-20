@@ -5,7 +5,7 @@ import random
 import re
 from typing import Callable, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, PrivateAttr
 
 from .model import (
     Attributes,

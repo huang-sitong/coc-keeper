@@ -6,8 +6,8 @@ from keeper.base.dice.model import CheckLevel, CheckResult, Difficulty
 
 
 def resolve_check(
-    roll: int,
-    value: int,
+    roll: int, # 骰子随机数
+    value: int, # 成功率，在车卡时限制成功率上限
     difficulty: Difficulty = Difficulty.NORMAL,
 ) -> CheckResult:
     """COC7 检定裁决（技能/属性共用）。"""

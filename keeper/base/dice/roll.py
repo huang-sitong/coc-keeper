@@ -1,45 +1,49 @@
 # -*- coding: utf-8 -*-
-"""通用掷骰函数：d100、骰式解析与 DB 替换。"""
-import math
+"""通用掷骰函数：d100 与骰式解析。"""
 import random
 import re
-from typing import Callable
 
 
-def roll(max_value: int = 100, rng: Callable[[], float] = random.random) -> int:
+def roll(max_value: int = 100, cheat: int = 0) -> int:
     """掷一颗 ``max_value`` 面骰，返回 1 到 ``max_value``（含）的整数。
 
-    默认为 d100，因此 ``roll()`` 等价于掷 d100。
+    ``cheat`` 大于 0 时直接返回该值，便于测试或指定结果。
     """
+    if cheat > 0:
+        return cheat
     if max_value < 1:
         raise ValueError("max_value must be >= 1")
-    return math.floor(rng() * max_value) + 1
+    return random.randint(1, max_value)
 
 
-def roll_d100(rng: Callable[[], float] = random.random) -> int:
-    """掷 d100，返回 1-100。"""
-    return roll(100, rng)
+def roll_ndm(expr: str, cheat: int = 0) -> int:
+    """解析并计算 ``nDm`` 骰式，例如 ``6D10 + 1D4``、``3D6+4``。
 
-
-def roll_dice(expr: str, db: str = "0", rng: Callable[[], float] = random.random) -> int:
-    """解析掷骰表达式（``2D6+1``、``1D3+DB``）。
-
-    ``DB`` 会先替换为角色伤害加值，再按常规骰子表达式计算。
+    支持大小写、省略骰子数量（``D6`` 等价于 ``1D6``）以及正负常数项。
+    ``cheat`` 大于 0 时直接返回该值，不进行随机掷骰。
     """
-    normalized = re.sub(r"DB", db or "0", expr, flags=re.IGNORECASE)
+    if cheat > 0:
+        return cheat
+
+    normalized = re.sub(r"\s+", "", expr)
     normalized = normalized.replace("+-", "-")
+    if not normalized:
+        return 0
+
     total = 0
     for term in re.split(r"(?=[+-])", normalized):
         if not term:
             continue
+
         sign = -1 if term.startswith("-") else 1
-        t = term.lstrip("+-")
-        m = re.fullmatch(r"(\d*)d(\d+)", t, flags=re.IGNORECASE)
-        if m:
-            times = int(m.group(1)) if m.group(1) else 1
-            die = int(m.group(2))
-            s = sum(roll(die, rng) for _ in range(times))
-            total += sign * s
+        body = term.lstrip("+-")
+
+        match = re.fullmatch(r"(\d*)d(\d+)", body, flags=re.IGNORECASE)
+        if match:
+            times = int(match.group(1)) if match.group(1) else 1
+            sides = int(match.group(2))
+            total += sign * sum(roll(sides) for _ in range(times))
         else:
-            total += sign * (int(t) if t else 0)
+            total += sign * (int(body) if body else 0)
+
     return total
