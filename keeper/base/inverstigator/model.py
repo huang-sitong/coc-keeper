@@ -47,6 +47,7 @@ class Assets(BaseModel):
     consumption: str = "0"
     assets: str = ""
     items: str = ""
+    # TODO 要创建独立的魔法类，添加到base_creature中。但是受限于目前车卡程序生成的JSON格式，需要自己创建独立的车卡程序
     magic_items: str = Field(default="", alias="magicItems")
     magics: str = ""
     touches: str = ""

@@ -21,7 +21,7 @@ class BaseCreature(BaseModel):
         serialize_by_alias=True,
     )
 
-    describe: str = ""
+    description: str = ""
 
     name: str = "null"
 
