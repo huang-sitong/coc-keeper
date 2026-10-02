@@ -155,7 +155,6 @@ class Weapon(BaseModel):
 
     name: str = ""
     skill: str = ""
-    skill_id: str = ""
     damage: str = ""
     range: str = ""
     tho: str = "0"
@@ -165,3 +164,9 @@ class Weapon(BaseModel):
     weight: str = ""
     note: str = ""
     success: str = ""
+
+class Magic(BaseModel):
+
+    name: str = ""
+    cost: str = "0"
+    description: str = ""

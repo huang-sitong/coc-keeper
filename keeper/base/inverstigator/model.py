@@ -30,6 +30,7 @@ class CharacterStatus(BaseModel):
 class Stories(BaseModel):
     """个人故事与描述。"""
     model_config = ConfigDict(populate_by_name=True, serialize_by_alias=True)
+
     app: str = ""
     belief: str = ""
     i_person: str = Field(default="", alias="IPerson")
@@ -41,15 +42,13 @@ class Stories(BaseModel):
     desc: str = ""
 
 class Assets(BaseModel):
-    """资产与随身物品。"""
+    """资产、随身物品与第三类接触。"""
     model_config = ConfigDict(populate_by_name=True, serialize_by_alias=True)
+
     cash: str = "0"
     consumption: str = "0"
     assets: str = ""
     items: str = ""
-    # TODO 要创建独立的魔法类，添加到base_creature中。但是受限于目前车卡程序生成的JSON格式，需要自己创建独立的车卡程序
-    magic_items: str = Field(default="", alias="magicItems")
-    magics: str = ""
     touches: str = ""
 
 class ExperiencedModule(BaseModel):

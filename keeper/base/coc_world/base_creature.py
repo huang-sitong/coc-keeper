@@ -12,7 +12,8 @@ from .model import (
     DeriveAttributes,
     BattleAttributes,
     SkillGroups,
-    Weapon
+    Weapon,
+    Magic
 )
 
 class BaseCreature(BaseModel):
@@ -44,6 +45,10 @@ class BaseCreature(BaseModel):
 
     # ----武器----
     weapons: list[Weapon] = Field(default_factory=list)
+
+    # ----魔法----
+    magic: list[Magic] = Field(default_factory=list)
+    
     # name -> index
     _weapon_index: dict[str, int] = PrivateAttr(default_factory=dict)
 
