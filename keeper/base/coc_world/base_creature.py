@@ -22,8 +22,6 @@ class BaseCreature(BaseModel):
         serialize_by_alias=True,
     )
 
-    description: str = ""
-
     name: str = "null"
 
     # ---- 属性 ----

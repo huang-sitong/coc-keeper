@@ -16,7 +16,7 @@ from .model import (
 
 class Investigator(BaseCreature):
 
-    player_name: str = ""
+    player_name: str = Field(default="", alias="playerName") # 姓名/昵称，与游戏中的角色无关
     time: str = ""
     job: str = ""
     age: str = ""
