@@ -157,10 +157,10 @@ class Weapon(BaseModel):
     name: str = "徒手格斗"
     skill: str = "格斗(斗殴)"
     damage: str = "1D3+DB"
-    range: str = "0"
-    through: str = "0"
+    range: str = "接触" # 基础射程
+    through: bool = False # 是否贯穿
     round: str = "1"
-    num: int = 0
+    num: int = 0 # 装弹数
     err: int = 0
     weight: str = ""
     note: str = ""

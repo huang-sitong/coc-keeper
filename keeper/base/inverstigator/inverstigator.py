@@ -11,7 +11,8 @@ from .model import (
     Stories,
     Assets,
     ExperiencedModule,
-    Friend
+    Friend,
+    Touch
 )
 
 class Investigator(BaseCreature):
@@ -30,3 +31,4 @@ class Investigator(BaseCreature):
     assets: Assets = Field(default_factory=Assets)
     experienced_modules: list[ExperiencedModule] = Field(default_factory=list, alias="experiencedModules")
     friends: list[Friend] = Field(default_factory=list)
+    touchs: list[Touch] = Field(default_factory=list)
