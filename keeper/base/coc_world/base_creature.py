@@ -3,9 +3,9 @@
 import math
 import random
 import re
-from typing import Callable, Optional
+from typing import Any, Callable, Optional
 
-from pydantic import BaseModel, Field, PrivateAttr
+from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 
 from .model import (
     Attributes,
@@ -53,8 +53,8 @@ class BaseCreature(BaseModel):
 
     # ----武器相关func----
 
-    def model_post_init(self, __context: Any) -> None:
-        super().model_post_init(__context)
+    def model_post_init(self, context: Any, /) -> None:
+        super().model_post_init(context)
         self.update_index()
 
     # ---------------- 索引维护 ----------------

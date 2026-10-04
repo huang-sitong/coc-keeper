@@ -1,7 +1,7 @@
 from enum import Enum
-from typing import Optional
+from typing import Any, Callable, Optional
 
-from pydantic import BaseModel, Field, PrivateAttr
+from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 
 class Content(BaseModel):
     title: str = ""
@@ -16,18 +16,31 @@ class PossibleCheck(BaseModel):
     check: str = ""
     result: str = "" # 包涵成功和失败的结果
 
+class PossibleCombat(BaseModel):
+    when: str = ""
+    npc: list[str] = Field(default_factory=list)
+    result: str = "" # 包涵成功和失败的结果
+
+class KeyItem(BaseModel):
+    name: str = ""
+    description: str = ""
+
 class Chapter(BaseModel):
     model_config = ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     title: str = ""
     location: str = ""
     overview: str = ""
-    appear_npc: str = Field(default = "", alias="keeperInfo")
 
-    possible_dialogue: list[PossibleDialogue] = Field(default_factory=PossibleDialogue, alias="possibleDialogue")
-    possible_check: list[PossibleCheck] = Field(default_factory=PossibleCheck, alias="possibleCheck")
+    keeper_info: str = Field(default = "", alias="keeperInfo") # 在本章节中给keeper的信息，玩家不需要知道
+    appear_npc: list[str] = Field(default_factory=list, alias="appearNPC")
 
-    raw: str = ""
+    possible_dialogue: list[PossibleDialogue] = Field(default_factory=list, alias="possibleDialogue") # 通过对话就能获取的信息，回答不能包含秘密
+    possible_check: list[PossibleCheck] = Field(default_factory=list, alias="possibleCheck") # 包括属性和技能检定
+    possible_combat: list[PossibleCombat] = Field(default_factory=list, alias="possibleCombat")
+    key_item: list[KeyItem] = Field(default_factory=list, alias="keyItem")
+
+    raw: list[Content] = Field(default_factory=list) # 原始文本入口
 
 class Ending(BaseModel):
     condition: str = "" # 触发条件

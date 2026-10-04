@@ -1,7 +1,7 @@
 from enum import Enum
-from typing import Optional
+from typing import Any, Callable, Optional
 
-from pydantic import BaseModel, Field, PrivateAttr
+from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 
 class BodyStates(BaseModel):
     """身体状态。"""

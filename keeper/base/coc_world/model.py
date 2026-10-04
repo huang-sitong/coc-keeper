@@ -1,23 +1,23 @@
 from enum import Enum
-from typing import Optional
+from typing import Any, Callable, Optional
 
-from pydantic import BaseModel, Field, PrivateAttr
+from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 
 class Attributes(BaseModel):
     """八项基础属性与幸运。"""
 
     model_config = ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    str_: int = Field(default=0, alias="str")
-    dex_: int = Field(default=0, alias="dex")
-    con_: int = Field(default=0, alias="con")
-    app_: int = Field(default=0, alias="app")
-    pow_: int = Field(default=0, alias="pow")
-    siz_: int = Field(default=0, alias="siz")
-    edu_: int = Field(default=0, alias="edu")
-    int_: int = Field(default=0, alias="int")
+    str_: int = Field(default=25, alias="str")
+    dex_: int = Field(default=25, alias="dex")
+    con_: int = Field(default=25, alias="con")
+    app_: int = Field(default=25, alias="app")
+    pow_: int = Field(default=25, alias="pow")
+    siz_: int = Field(default=25, alias="siz")
+    edu_: int = Field(default=25, alias="edu")
+    int_: int = Field(default=25, alias="int")
 
-    luc_: int = Field(default=0, alias="luc")
+    luc_: int = Field(default=25, alias="luc")
     # ---- 通用读写 ----
 
     @classmethod
@@ -83,9 +83,9 @@ _GROUP_NAMES = (
 )
 
 class Skill(BaseModel):
-
+    # NPC属性只包含name, base
     name: str = ""
-    base: int = 0
+    base: int = 25
     job: int = 0
     interest: int = 0
     growth: int = 0
@@ -106,7 +106,8 @@ class SkillGroups(BaseModel):
     # name -> (group, index)
     _index: dict[str, tuple[str, int]] = PrivateAttr(default_factory=dict)
 
-    def model_post_init(self, __context) -> None:
+    def model_post_init(self, context: Any, /) -> None:
+        super().model_post_init(context)
         self.update_index()
 
     # ---------------- 索引维护 ----------------
@@ -153,17 +154,17 @@ class SkillGroups(BaseModel):
 class Weapon(BaseModel):
     """武器条目"""
 
-    name: str = ""
-    skill: str = ""
-    damage: str = ""
-    range: str = ""
-    tho: str = "0"
+    name: str = "徒手格斗"
+    skill: str = "格斗(斗殴)"
+    damage: str = "1D3+DB"
+    range: str = "0"
+    through: str = "0"
     round: str = "1"
-    num: str = ""
-    err: str = ""
+    num: int = 0
+    err: int = 0
     weight: str = ""
     note: str = ""
-    success: str = ""
+    success: int = 25
 
 class Magic(BaseModel):
 

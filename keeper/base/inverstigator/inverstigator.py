@@ -1,9 +1,9 @@
 import math
 import random
 import re
-from typing import Callable, Optional
+from typing import Any, Callable, Optional
 
-from pydantic import BaseModel, Field, PrivateAttr
+from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 
 from keeper.base.coc_world.base_creature import BaseCreature
 from .model import (
