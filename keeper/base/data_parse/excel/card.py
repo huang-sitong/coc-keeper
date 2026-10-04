@@ -22,8 +22,10 @@
 则以区块标题行推导表头列号。
 
 取值口径是「一格对一格」：模板自带的示例行（``例：【毒汤】``）与占位提示
-（``请务必在此填写背景故事！``）都原样进结果，不做任何内容过滤；只有整行
-没有任何内容的空行才跳过。
+（``请务必在此填写背景故事！``）都原样进结果，不做内容过滤。技能名取基础格与
+子技能格的原文拼接（无论子技能是否填写），``：`` 与占位序号 ``①②③④⑤⑥⑦⑧⑨⑩``
+统一替换成半角 ``:``；替换后名字以 ``:`` 结尾的行（专长格没填，如 ``格斗③``、
+``生存：``）跳过该技能。其余区块只有整行没有任何内容的空行才跳过。
 """
 from __future__ import annotations
 
@@ -44,10 +46,8 @@ from keeper.base.coc_world.model import (
     MagicPoints,
     Sanity,
     Skill,
-    SkillGroups,
     Weapon,
 )
-from keeper.base.data_parse.excel.skill_groups import skill_group
 from keeper.base.investigator.investigator import Investigator
 from keeper.base.investigator.model import (
     Assets,
@@ -69,7 +69,8 @@ DEFAULT_SHEET = "人物卡"
 _EMPTY_SYMBOLS = ("——", "—", "-", "×")
 
 _WHITESPACE_RE = re.compile(r"\s+")
-_CIRCLED_INDEX_RE = re.compile(r"[①②③④⑤⑥⑦⑧⑨⑩]")
+# 占位序号①-⑩ → `:` 的替换表（与全角冒号一起统一成半角冒号）
+_CIRCLED_TO_COLON = str.maketrans({c: ":" for c in "①②③④⑤⑥⑦⑧⑨⑩"})
 
 
 # --------------------------------------------------------------------------- #
@@ -240,18 +241,11 @@ def _nearest(columns: list[int], target: int) -> int | None:
 
 
 def _compose_skill_name(base: str, sub: str) -> str:
-    """拼接技能名与它的子技能名：`格斗：`+`斗殴` → `格斗：斗殴`，`科学①`+`物理学` → `科学：物理学`。
+    """技能名 = 基础格原文 + 子技能格原文（无论子技能是否填写都一样拼）。
 
-    没有子技能时去掉悬空的冒号（`生存：` → `生存`）。
+    拼完把 ``：`` 和占位序号 ``①②③④⑤⑥⑦⑧⑨⑩`` 全部替换成半角 ``:``。
     """
-    if not sub:
-        return base.rstrip("：:").strip() or base
-    if base.endswith(("：", ":")):
-        return base + sub
-    match = _CIRCLED_INDEX_RE.search(base)
-    if match:
-        return base[: match.start()] + "：" + sub
-    return base + sub
+    return (base + sub).replace("：", ":").translate(_CIRCLED_TO_COLON)
 
 
 # --------------------------------------------------------------------------- #
@@ -372,9 +366,12 @@ def _parse_skills(sheet: _Sheet) -> list[Skill]:
             if not name:
                 break  # 该栏技能列到头了
             sub = _clean(sheet.value(row, sub_col))
+            skill_name = _compose_skill_name(name, sub)
+            if skill_name.endswith(":"):
+                continue  # 名字末尾是 `:`：专长格没填（`格斗③`、`生存：`），跳过该技能
             skills.append(
                 Skill(
-                    name=_compose_skill_name(name, sub),
+                    name=skill_name,
                     base=_to_int(sheet.value(row, base_col) if base_col else None),
                     growth=_to_int(sheet.value(row, growth_col) if growth_col else None),
                     job=_to_int(sheet.value(row, job_col) if job_col else None),
@@ -386,13 +383,6 @@ def _parse_skills(sheet: _Sheet) -> list[Skill]:
                 )
             )
     return skills
-
-
-def _parse_skill_groups(skills: list[Skill]) -> SkillGroups:
-    groups = SkillGroups()
-    for skill in skills:
-        groups.set(skill_group(skill.name), skill)
-    return groups
 
 
 _WEAPON_ROWS = (51, 57)
@@ -746,7 +736,7 @@ def parse_card_excel(
         attributes=_parse_attributes(sheet),
         derive_attributes=_parse_derived(sheet),
         battle_attributes=_parse_battle(sheet),
-        skill_groups=_parse_skill_groups(skills),
+        skills=skills,
         weapons=_parse_weapons(sheet),
         magic=_parse_magic(sheet),
         character_status=_parse_status(sheet),

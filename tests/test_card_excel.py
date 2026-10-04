@@ -11,26 +11,12 @@ from pathlib import Path
 import pytest
 
 from keeper.base.data_parse import parse_card_excel, parse_card_excel_json
-from keeper.base.data_parse.excel.skill_groups import skill_group
 from keeper.base.investigator.investigator import Investigator
 
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / ".docs"
 EXAMPLE_CARD = DOCS / "COC7CardExample_nouxiaxia.xlsx"
 EMPTY_CARD = DOCS / "COC7EmptyCardCY23Final.xlsx"
-
-_GROUPS = (
-    "special",
-    "explore",
-    "social",
-    "combat",
-    "medical",
-    "move",
-    "knowledge",
-    "tech",
-    "drive",
-    "other",
-)
 
 
 def _available_cards() -> list[Path]:
@@ -48,15 +34,10 @@ def test_parse_any_available_card_roundtrip() -> None:
         payload = json.loads(parse_card_excel_json(path))
         assert Investigator.model_validate(payload).name == investigator.name
 
-        skill_groups = investigator.skill_groups
-        total = sum(len(getattr(skill_groups, group)) for group in _GROUPS)
-        assert total > 0, f"{path.name}: 技能数为 0"
-        # 技能不能有重名（SkillGroups 索引依赖唯一技能名）
-        names = [
-            skill.name
-            for group in _GROUPS
-            for skill in getattr(skill_groups, group)
-        ]
+        skills = investigator.skills
+        assert len(skills) > 0, f"{path.name}: 技能数为 0"
+        # 技能不能有重名（BaseCreature 技能索引依赖唯一技能名）
+        names = [skill.name for skill in skills]
         assert len(names) == len(set(names)), f"{path.name}: 存在重名技能"
 
         # 派生属性自洽
@@ -104,10 +85,7 @@ def test_parse_example_card_values() -> None:
 
     # 本职技能（会计师）
     professional = {
-        skill.name
-        for group in _GROUPS
-        for skill in getattr(investigator.skill_groups, group)
-        if skill.is_professional
+        skill.name for skill in investigator.skills if skill.is_professional
     }
     assert professional == {
         "会计",
@@ -120,12 +98,14 @@ def test_parse_example_card_values() -> None:
     }
 
     # 技能点拆分
-    accounting = investigator.skill_groups.knowledge
-    skill = next(item for item in accounting if item.name == "会计")
-    assert (skill.base, skill.growth) == (5, 23)
-    anthropology = next(item for item in accounting if item.name == "人类学")
-    assert (anthropology.base, anthropology.job) == (1, 34)
-    assert anthropology.is_professional is False
+    skill = investigator.get_skill("会计")
+    assert skill is not None and (skill.base, skill.growth) == (5, 23)
+    anthropology = investigator.get_skill("人类学")
+    assert (
+        anthropology is not None
+        and (anthropology.base, anthropology.job) == (1, 34)
+        and anthropology.is_professional is False
+    )
 
     # 武器表
     weapons = {weapon.name: weapon for weapon in investigator.weapons}
@@ -192,6 +172,25 @@ def test_example_rows_are_parsed_one_to_one() -> None:
     assert investigator.assets.assets == "请在这里详述你的资产"
 
 
+@pytest.mark.skipif(not EXAMPLE_CARD.exists(), reason="示例卡未随仓库提供")
+def test_skill_name_normalization() -> None:
+    """技能名取原文拼接、冒号归一；末尾为 `:` 的技能跳过。"""
+    investigator = parse_card_excel(EXAMPLE_CARD)
+    names = {skill.name for skill in investigator.skills}
+
+    # `：` 与占位序号①-⑩ 统一替换成半角 `:`
+    assert {"格斗:斗殴", "格斗:链枷", "格斗:斧"} <= names
+    assert {"射击:手枪", "射击:弓术", "射击:冲锋枪"} <= names
+    assert {"科学:物理学", "科学:植物学"} <= names
+    assert not any("：" in name for name in names)
+    assert not any(set(name) & set("①②③④⑤⑥⑦⑧⑨⑩") for name in names)
+    # 末尾是 `:`（专长格没填）的技能整个跳过
+    assert not any(name.endswith(":") for name in names)
+    assert names.isdisjoint({"格斗", "射击", "科学", "技艺", "外语", "生存", "驾驶", "学识"})
+    # 不带冒号的技能原样保留（包括初始值为 0 的克苏鲁神话）
+    assert {"克苏鲁神话", "闪避", "母语", "自定义技能"} <= names
+
+
 def test_missing_file(tmp_path: Path) -> None:
     with pytest.raises(FileNotFoundError):
         parse_card_excel(tmp_path / "不存在.xlsx")
@@ -203,24 +202,3 @@ def test_unknown_sheet() -> None:
         pytest.skip(".docs/ 下没有可用车卡样例")
     with pytest.raises(ValueError, match="工作表"):
         parse_card_excel(cards[0], sheet_name="没有这张表")
-
-
-@pytest.mark.parametrize(
-    ("name", "expected"),
-    [
-        ("格斗：斗殴", "combat"),
-        ("射击：弓术", "combat"),
-        ("科学：物理学", "knowledge"),
-        ("外语②", "knowledge"),
-        ("计算机使用 Ω", "tech"),
-        ("生存：", "explore"),
-        ("驾驶：", "drive"),
-        ("会计", "knowledge"),
-        ("心理学", "social"),
-        ("急救", "medical"),
-        ("吃饭", "other"),
-        ("没见过的技能", "other"),
-    ],
-)
-def test_skill_group(name: str, expected: str) -> None:
-    assert skill_group(name) == expected

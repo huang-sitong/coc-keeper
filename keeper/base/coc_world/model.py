@@ -1,7 +1,4 @@
-from enum import Enum
-from typing import Any, Callable, Optional
-
-from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
+from pydantic import BaseModel, ConfigDict, Field
 
 class Attributes(BaseModel):
     """八项基础属性与幸运。"""
@@ -77,11 +74,6 @@ class BattleAttributes(BaseModel):
 
 # skills
 
-_GROUP_NAMES = (
-    "special", "explore", "social", "combat", "medical",
-    "move", "knowledge", "tech", "drive", "other",
-)
-
 class Skill(BaseModel):
     # NPC属性只包含name, base
     name: str = ""
@@ -90,65 +82,6 @@ class Skill(BaseModel):
     interest: int = 0
     growth: int = 0
     is_professional: bool = False
-
-class SkillGroups(BaseModel):
-
-    special: list[Skill] = Field(default_factory=list)
-    explore: list[Skill] = Field(default_factory=list)
-    social: list[Skill] = Field(default_factory=list)
-    combat: list[Skill] = Field(default_factory=list)
-    medical: list[Skill] = Field(default_factory=list)
-    move: list[Skill] = Field(default_factory=list)
-    knowledge: list[Skill] = Field(default_factory=list)
-    tech: list[Skill] = Field(default_factory=list)
-    drive: list[Skill] = Field(default_factory=list)
-    other: list[Skill] = Field(default_factory=list)
-    # name -> (group, index)
-    _index: dict[str, tuple[str, int]] = PrivateAttr(default_factory=dict)
-
-    def model_post_init(self, context: Any, /) -> None:
-        super().model_post_init(context)
-        self.update_index()
-
-    # ---------------- 索引维护 ----------------
-
-    def update_index(self) -> None:
-        """全量重建索引。任何直接改动分组列表后都应调用。"""
-        idx: dict[str, tuple[str, int]] = {}
-        for group in _GROUP_NAMES:
-            for i, skill in enumerate(getattr(self, group)):
-                if skill.name in idx:
-                    raise ValueError(f"技能名重复: {skill.name!r}")
-                idx[skill.name] = (group, i)
-        self._index = idx
-
-    # ---------------- 读写 ----------------
-
-    def get(self, name: str) -> Skill | None:
-        """按名称取技能。不存在返回 None。"""
-        loc = self._index.get(name)
-        if loc is None:
-            return None
-        group, i = loc
-        return getattr(self, group)[i]
-
-    def set(self, group: str, skill: Skill) -> None:
-        """
-        在指定分组中写入技能：
-          - 若同名技能已存在（可能在别的分组），先移除旧的；
-          - 再把新的追加到目标分组末尾；
-          - 最后重建索引。
-        """
-        if group not in _GROUP_NAMES:
-            raise KeyError(f"未知分组: {group!r}")
-
-        loc = self._index.get(skill.name)
-        if loc is not None:
-            old_group, old_i = loc
-            getattr(self, old_group).pop(old_i)
-
-        getattr(self, group).append(skill)
-        self.update_index()
 # end
 
 class Weapon(BaseModel):
