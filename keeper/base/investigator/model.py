@@ -42,13 +42,13 @@ class Stories(BaseModel):
     desc: str = "" # 个人介绍
 
 class Assets(BaseModel):
-    """资产、随身物品与第三类接触。"""
+    """资产与随身物品：人物卡「资产」表。"""
     model_config = ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    cash: str = "0" # 资产值
+    cash: str = "0" # 资产值：当前现金 + 单位
     consumption: str = "0" # 消费水平
-    assets: str = "" # 描述拥有的资产
-    items: str = "" # 随身物品
+    assets: str = "" # 资产描述：「其他资产」下方的自由详述格
+    items: str = "" # 随身物品：多件以 ; 分隔
 
 class ExperiencedModule(BaseModel):
     """经历过的模组/调查员经历"""
@@ -57,12 +57,24 @@ class ExperiencedModule(BaseModel):
     describetion: str = ""
 
 class Friend(BaseModel):
-    """盟友/好友。"""
+    """调查员伙伴：人物卡「调查员伙伴」表的一行。
 
-    name: str = ""
-    relationship: str = ""
+    表头：姓名 / 玩家 / 注释 / 造成改变 / 相遇模组。
+    """
+
+    name: str = "" # 姓名：伙伴（NPC/PC）在游戏中的名字
+    player: str = "" # 玩家：谁扮演这位伙伴
+    note: str = "" # 注释：对关系的一句话描述
+    change: str = "" # 造成改变：这段关系对调查员造成的变化
+    module: str = "" # 相遇模组：在哪里认识的
 
 class Touch(BaseModel):
-    """第三类接触"""
-    describetion: str = ""
-    result: str = ""
+    """第三类接触：人物卡「第三类接触（古籍、咒文、神话知识等）」表的一行。
+
+    表头：遇到了 / 获得的结果 / 备注 / 累计。
+    """
+
+    describetion: str = "" # 遇到了：接触到的存在/古籍/咒文
+    result: str = "" # 获得的结果：技能/理智等变化
+    note: str = "" # 备注
+    total: int = 0 # 累计：该次接触累计消耗的 SAN

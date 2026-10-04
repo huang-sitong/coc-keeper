@@ -18,6 +18,7 @@ dependencies = [
     # 以下为后续移植 Telegram 等适配器预留
     "python-telegram-bot>=22.0",
     "telegramify-markdown>=0.5.1",
+    "openpyxl>=3.1.5",
 ]
 
 [project.scripts]
