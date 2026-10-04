@@ -61,4 +61,4 @@ class CombatSkill(BaseModel):
     range: str = "" # 作用范围，默认为接触
     round: str = "1" # 每回合使用次数，默认为1/回合
     description: str = ""
-    success: str = "100" # 成功率默认为100
+    success: int = 100 # 成功率默认为100

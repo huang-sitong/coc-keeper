@@ -23,7 +23,7 @@ class Module(BaseModel):
     location: str = ""
     keeper_info: list[Content] = Field(default_factory=list, alias="keeperInfo") # 给keepr的信息/秘密，不需要玩家知道
     information: list[Content] = Field(default_factory=list) # 玩家可以从游玩过程中获取的信息
-    backgroud: list[Content] = Field(default_factory=list) # 可以向玩家公布的世界观背景
+    background: list[Content] = Field(default_factory=list) # 可以向玩家公布的世界观背景
     summary: str = ""
 
     opening: str = "" # 开场白，将玩家引入到世界观中，但是注意不要暴露秘密

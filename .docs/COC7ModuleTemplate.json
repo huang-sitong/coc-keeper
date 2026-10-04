@@ -1,0 +1,159 @@
+{
+  "_说明": {
+    "用途": "本文件是 keeper.base.module.Module 的 JSON 输出模板。请依据给定的模组内容，保持字段结构与键名完全不变，把所有 {{...}} 占位符替换为实际内容，最终只输出纯 JSON 文本。",
+    "规则": [
+      "键名必须与模板完全一致：keeperInfo / appearNPC / possibleDialogue / possibleCheck / possibleCombat / keyItem / deriveAttributes / battleAttributes 为驼峰别名，不要改回下划线。",
+      "npc[].position 为整数枚举：0 = 友好(FRIENDLY)，1 = 中立(NEUTRAL)，2 = 敌对(HOSTILE)。",
+      "数组中的单个元素只是结构示例：可按模组实际数量增删元素；没有内容的数组保留为空 []，不要省略字段，也不要输出 null。",
+      "attributes 为 COC7 八项基础属性加幸运，取值为 0-100 的整数；deriveAttributes（理智/生命/魔法）与 battleAttributes 中的数值字段同为整数，db 与 armor 为字符串（如 \"+1D4\"、\"0\"、\"2\"）。",
+      "weapons[].success 为整数（技能成功率），combatSkill[].success 为字符串（如 \"60\"、\"100\"），weapons[].round 与 combatSkill[].round 为字符串（如 \"1\"、\"2/回合\"）。",
+      "keeperInfo / keeper* 字段只放玩家不应知道的秘密，information 只放玩家游玩中可获取的信息，background 放可向玩家公布的世界观背景，三者不要混用。",
+      "所有字符串字段都可以是空字符串 \"\"，但字段本身不要省略。",
+      "输出时不要包含本 _说明 字段。"
+    ]
+  },
+  "title": "{{模组标题}}",
+  "location": "{{故事主要发生地点}}",
+  "keeperInfo": [
+    {
+      "title": "{{给Keeper的保密信息标题}}",
+      "text": "{{Keeper 专用背景、真相、秘密：玩家不需要也不应知道的内容}}"
+    }
+  ],
+  "information": [
+    {
+      "title": "{{玩家可获取的信息标题}}",
+      "text": "{{玩家在游玩过程中通过探索、对话或检定可以获得的事实信息}}"
+    }
+  ],
+  "background": [
+    {
+      "title": "{{可公布的世界观条目标题}}",
+      "text": "{{开局即可向玩家公布的时代背景、地域设定、公共常识}}"
+    }
+  ],
+  "summary": "{{模组一句话总览：核心冲突与调查主线}}",
+  "opening": "{{开场白：把玩家引入世界观的叙述，注意不要暴露任何秘密}}",
+  "chapter": [
+    {
+      "title": "{{章节标题}}",
+      "location": "{{本章发生地点}}",
+      "overview": "{{本章剧情概览：发生了什么、玩家的目标是什么}}",
+      "keeperInfo": "{{仅Keeper可知的本章提示：隐藏线索、NPC真实意图、推进节奏建议}}",
+      "appearNPC": [
+        "{{本章出场的NPC姓名，须与 npc[].name 一致}}"
+      ],
+      "possibleDialogue": [
+        {
+          "sentence": "{{玩家可能提出的对话问题或NPC的台词}}",
+          "answer": "{{对应回答，可包含通过对话获得的信息，但不能包含秘密}}"
+        }
+      ],
+      "possibleCheck": [
+        {
+          "when": "{{触发检定的时机与描述，如：调查书房书架时}}",
+          "check": "{{检定项，如：侦查(困难)、侦查(常规)、灵感}}",
+          "result": "{{检定结果文本，需同时写明成功与失败分别发生什么}}"
+        }
+      ],
+      "possibleCombat": [
+        {
+          "when": "{{触发战斗的时机与描述}}",
+          "npc": [
+            "{{参战NPC姓名，须与 npc[].name 一致}}"
+          ],
+          "result": "{{战斗结果文本，需同时写明胜利与失败分别导向什么}}"
+        }
+      ],
+      "keyItem": [
+        {
+          "name": "{{关键物品名称}}",
+          "description": "{{关键物品的外观、作用与线索价值}}"
+        }
+      ],
+      "raw": [
+        {
+          "title": "{{原始文本段落标题}}",
+          "text": "{{本章的原始叙述文本入口，未经结构化的原文段落}}"
+        }
+      ]
+    }
+  ],
+  "ending": [
+    {
+      "condition": "{{结局触发条件，如：全员理智归零 / 找到日记并读完最后一段}}",
+      "text": "{{结局叙述：世界或角色的最终走向}}"
+    }
+  ],
+  "npc": [
+    {
+      "name": "{{NPC姓名}}",
+      "attributes": {
+        "str": 40,
+        "dex": 40,
+        "con": 40,
+        "app": 40,
+        "pow": 40,
+        "siz": 40,
+        "edu": 40,
+        "int": 40,
+        "luc": 40
+      },
+      "deriveAttributes": {
+        "sanity": {
+          "current": 45,
+          "max": 55
+        },
+        "hp": {
+          "current": 9,
+          "max": 11
+        },
+        "mp": {
+          "current": 6,
+          "max": 10
+        }
+      },
+      "battleAttributes": {
+        "db": "0",
+        "build": 0,
+        "mov": 8,
+        "armor": "0"
+      },
+      "skills": [
+        {
+          "name": "{{技能名，如：侦查}}",
+          "base": 40
+        }
+      ],
+      "weapons": [
+        {
+          "name": "{{武器名，如：左轮手枪}}",
+          "damage": "{{伤害，如：1D10}}",
+          "range": "{{射程，如：15米 / 接触}}",
+          "round": "1",
+          "note": "{{武器备注}}",
+          "success": 40
+        }
+      ],
+      "magic": [
+        {
+          "name": "{{咒语/魔法名}}",
+          "cost": "{{MP消耗，如：2}}",
+          "description": "{{效果描述}}"
+        }
+      ],
+      "position": 1,
+      "description": "{{NPC基本信息：年龄、身份、外貌、与剧情的关系}}",
+      "keeperInfo": "{{NPC的性格、特性、真实动机、扮演要点等Keeper专用信息}}",
+      "combatSkill": [
+        {
+          "name": "{{战技名，如：撕咬}}",
+          "range": "{{作用范围，默认接触}}",
+          "round": "{{每回合使用次数，默认 1}}",
+          "description": "{{战技效果描述}}",
+          "success": 40
+        }
+      ]
+    }
+  ]
+}

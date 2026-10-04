@@ -5,16 +5,16 @@ class Attributes(BaseModel):
 
     model_config = ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    str_: int = Field(default=25, alias="str")
-    dex_: int = Field(default=25, alias="dex")
-    con_: int = Field(default=25, alias="con")
-    app_: int = Field(default=25, alias="app")
-    pow_: int = Field(default=25, alias="pow")
-    siz_: int = Field(default=25, alias="siz")
-    edu_: int = Field(default=25, alias="edu")
-    int_: int = Field(default=25, alias="int")
+    str_: int = Field(default=40, alias="str")
+    dex_: int = Field(default=40, alias="dex")
+    con_: int = Field(default=40, alias="con")
+    app_: int = Field(default=40, alias="app")
+    pow_: int = Field(default=40, alias="pow")
+    siz_: int = Field(default=40, alias="siz")
+    edu_: int = Field(default=40, alias="edu")
+    int_: int = Field(default=40, alias="int")
 
-    luc_: int = Field(default=25, alias="luc")
+    luc_: int = Field(default=40, alias="luc")
     # ---- 通用读写 ----
 
     @classmethod
@@ -40,20 +40,20 @@ class Attributes(BaseModel):
 class Sanity(BaseModel):
     """理智值。"""
 
-    current: int = 1
+    current: int = 98
     max: int = 99
 
 class HitPoints(BaseModel):
     """生命值。"""
 
-    current: int = 1
-    max: int = 1
+    current: int = 10
+    max: int = 10
 
 class MagicPoints(BaseModel):
     """魔法值。"""
 
-    current: int = 0
-    max: int = 0
+    current: int = 1
+    max: int = 1
 
 class DeriveAttributes(BaseModel):
     """派生属性：理智 / 生命 / 魔法。"""
@@ -97,7 +97,7 @@ class Weapon(BaseModel):
     err: int = 0
     weight: str = ""
     note: str = ""
-    success: int = 25
+    success: int = 40
 
 class Magic(BaseModel):
 
