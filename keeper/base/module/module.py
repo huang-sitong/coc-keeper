@@ -6,8 +6,8 @@ from typing import Any, Callable, Optional
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 
 from keeper.base.coc_world.base_creature import BaseCreature
-from npc import NPC
-from model import(
+from .npc import NPC
+from .model import(
     Content,
     Chapter,
     Ending
@@ -30,4 +30,4 @@ class Module(BaseModel):
     chapter: list[Chapter] = Field(default_factory=list)
     ending: list[Ending] = Field(default_factory=list)
 
-    npc: list[NPC] = Field(default_factory=NPC)
+    npc: list[NPC] = Field(default_factory=list)
