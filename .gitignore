@@ -11,5 +11,7 @@ wheels/
 
 keeper.yaml
 
+.temp
+
 .docs/COC7CardExample_nouxiaxia.xlsx
 .docs/COC7CardExample_nouxiaxia.json

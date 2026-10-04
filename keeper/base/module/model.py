@@ -40,7 +40,7 @@ class Chapter(BaseModel):
     possible_combat: list[PossibleCombat] = Field(default_factory=list, alias="possibleCombat")
     key_item: list[KeyItem] = Field(default_factory=list, alias="keyItem")
 
-    raw: list[Content] = Field(default_factory=list) # 原始文本入口
+    content: list[Content] = Field(default_factory=list) # 文本内容入口，存储模组文本
 
 class Ending(BaseModel):
     condition: str = "" # 触发条件

@@ -6,8 +6,8 @@
       "npc[].position 为整数枚举：0 = 友好(FRIENDLY)，1 = 中立(NEUTRAL)，2 = 敌对(HOSTILE)。",
       "数组中的单个元素只是结构示例：可按模组实际数量增删元素；没有内容的数组保留为空 []，不要省略字段，也不要输出 null。",
       "attributes 为 COC7 八项基础属性加幸运，取值为 0-100 的整数；deriveAttributes（理智/生命/魔法）与 battleAttributes 中的数值字段同为整数，db 与 armor 为字符串（如 \"+1D4\"、\"0\"、\"2\"）。",
-      "weapons[].success 为整数（技能成功率），combatSkill[].success 为字符串（如 \"60\"、\"100\"），weapons[].round 与 combatSkill[].round 为字符串（如 \"1\"、\"2/回合\"）。",
-      "keeperInfo / keeper* 字段只放玩家不应知道的秘密，information 只放玩家游玩中可获取的信息，background 放可向玩家公布的世界观背景，三者不要混用。",
+      "weapons[].success，combatSkill[].success 为整数(成功率)，weapons[].round 与 combatSkill[].round 为字符串（如 \"1\"、\"2/回合\"）。",
+      "keeperInfo / keeper* 字段放玩家需要知道的信息/秘密，information 放玩家游玩中可获取的信息/秘密，background 放可向玩家公布的世界观背景，三者不要混用。",
       "所有字符串字段都可以是空字符串 \"\"，但字段本身不要省略。",
       "输出时不要包含本 _说明 字段。"
     ]
@@ -58,7 +58,7 @@
       ],
       "possibleCombat": [
         {
-          "when": "{{触发战斗的时机与描述}}",
+          "when": "{{触发战斗轮的时机与描述，与触发检定区分开}}",
           "npc": [
             "{{参战NPC姓名，须与 npc[].name 一致}}"
           ],
@@ -71,10 +71,10 @@
           "description": "{{关键物品的外观、作用与线索价值}}"
         }
       ],
-      "raw": [
+      "content": [
         {
-          "title": "{{原始文本段落标题}}",
-          "text": "{{本章的原始叙述文本入口，未经结构化的原文段落}}"
+          "title": "{{内容段落标题}}",
+          "text": "{{章节内容入口，存储模组文本细节}}"
         }
       ]
     }
