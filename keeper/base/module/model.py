@@ -31,16 +31,17 @@ class Chapter(BaseModel):
     title: str = ""
     location: str = ""
     overview: str = ""
-
+    process: str = ""
     keeper_info: str = Field(default = "", alias="keeperInfo") # 在本章节中给keeper的信息，玩家不需要知道
-    appear_npc: list[str] = Field(default_factory=list, alias="appearNPC")
 
+    appear_npc: list[str] = Field(default_factory=list, alias="appearNPC")
     possible_dialogue: list[PossibleDialogue] = Field(default_factory=list, alias="possibleDialogue") # 通过对话就能获取的信息，回答不能包含秘密
     possible_check: list[PossibleCheck] = Field(default_factory=list, alias="possibleCheck") # 包括属性和技能检定
     possible_combat: list[PossibleCombat] = Field(default_factory=list, alias="possibleCombat")
     key_item: list[KeyItem] = Field(default_factory=list, alias="keyItem")
 
-    content: list[Content] = Field(default_factory=list) # 文本内容入口，存储模组文本
+    begin_page: int = 0
+    end_page: int = 0
 
 class Ending(BaseModel):
     condition: str = "" # 触发条件

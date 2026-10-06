@@ -19,6 +19,7 @@ dependencies = [
     "python-telegram-bot>=22.0",
     "telegramify-markdown>=0.5.1",
     "openpyxl>=3.1.5",
+    "pypdf>=6.19.0",
 ]
 
 [project.scripts]
